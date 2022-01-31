@@ -35,22 +35,29 @@ do--//AutoEnch
     for i,v in pairs(Library.Save.Get().Pets) do
         if v.e and not Blacklist[v.id] and _G.Stop ~= true then
             local HasPower = false
+            local startTime = tick()
             spawn(function()
                 repeat
                     if not Library.Functions.CompareTable(_G.Wanted, PetToValidTable(GetPetInfo(v.uid).powers)) and not HasPower and not _G.Stop then
                         if #GetPetInfo(v.uid).powers > 1 then
                             warn('Pet: '..v.nk..'('..v.uid..')')
-                            warn(GetPetInfo(v.uid).powers[1][1], GetPetInfo(v.uid).powers[1][2])
-                            warn(GetPetInfo(v.uid).powers[2][1], GetPetInfo(v.uid).powers[2][2].."\n------------")
+                            warn("      ", GetPetInfo(v.uid).powers[1][1], GetPetInfo(v.uid).powers[1][2])
+                            warn("      ", GetPetInfo(v.uid).powers[2][1], GetPetInfo(v.uid).powers[2][2].."\n------------")
                         else
                             table.foreach(GetPetInfo(v.uid).powers, function(_, __)
                                 warn('Pet: '..v.nk..'('..v.uid..')')
-                                warn(__[1], __[2].."\n------------")
+                                warn("      ",__[1], __[2].."\n------------")
                             end)
                         end
                         Library.Network.Invoke("Enchant Pet", v.uid)
                     else
-                        warn("Pet: ", v.uid, " has wanted enchants.")
+                        local timeTook = tick() - startTime
+                        local mins = math.floor(timeTook / 60)
+                        timeTook = timeTook - (mins * 60)
+                        local secs = math.floor(timeTook)
+                        timeTook = timeTook - secs
+                        local ms = math.floor(timeTook * 1000)
+                        warn('Pet: '..v.nk..'('..v.uid..')'.." has wanted enchants. It took:", string.format("%d:%d.%d", mins, secs, ms))
                         HasPower = true
                     end
                     if Library.Save.Get().Diamonds < 500000 and _G.Stop ~= true and _G.AutoWithdraw then
@@ -68,4 +75,3 @@ do--//AutoEnch
         end
     end
 end
-
