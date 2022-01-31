@@ -39,12 +39,12 @@ do--//AutoEnch
                 repeat
                     if not Library.Functions.CompareTable(_G.Wanted, PetToValidTable(GetPetInfo(v.uid).powers)) and not HasPower and not _G.Stop then
                         if #GetPetInfo(v.uid).powers > 1 then
-                            warn('Pet: ', v.uid)
+                            warn('Pet: '..v.nk..'('..v.uid..')')
                             warn(GetPetInfo(v.uid).powers[1][1], GetPetInfo(v.uid).powers[1][2])
                             warn(GetPetInfo(v.uid).powers[2][1], GetPetInfo(v.uid).powers[2][2].."\n------------")
                         else
                             table.foreach(GetPetInfo(v.uid).powers, function(_, __)
-                                warn('Pet: ', v.uid)
+                                warn('Pet: '..v.nk..'('..v.uid..')')
                                 warn(__[1], __[2].."\n------------")
                             end)
                         end
