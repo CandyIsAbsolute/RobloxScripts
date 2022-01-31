@@ -19,7 +19,7 @@ do --//Checks&Functions
                 return v
             end
         end
-    end    
+    end
 end
 
 do--//AutoEnch
@@ -28,7 +28,11 @@ do--//AutoEnch
             local HasPower = false
             spawn(function()
                 repeat
-                    if not Library.Functions.CompareTable(_G.Wanted, GetPetInfo(v.uid).powers) and not HasPower and not _G.Stop then
+                    local t = {}
+                    for _,v in pairs(GetPetInfo(v.uid).powers) do
+                        t[v[1]] = v[2]
+                    end
+                    if not Library.Functions.CompareTable(_G.Wanted, t) and not HasPower and not _G.Stop then
                         if #GetPetInfo(v.uid).powers > 1 then
                             warn('Pet: ', v.uid)
                             warn(GetPetInfo(v.uid).powers[1][1], GetPetInfo(v.uid).powers[1][2])
