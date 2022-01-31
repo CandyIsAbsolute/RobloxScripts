@@ -20,6 +20,15 @@ do --//Checks&Functions
             end
         end
     end
+    function PetToValidTable(petpowers)
+        local temptable = {}
+        if petpowers then
+            table.foreach(petpowers, function(i, powers)
+                temptable[powers[1]] = powers[2]
+            end)
+        end 
+        return temptable
+    end
 end
 
 do--//AutoEnch
@@ -28,11 +37,7 @@ do--//AutoEnch
             local HasPower = false
             spawn(function()
                 repeat
-                    local t = {}
-                    for _,v in pairs(GetPetInfo(v.uid).powers) do
-                        t[v[1]] = v[2]
-                    end
-                    if not Library.Functions.CompareTable(_G.Wanted, t) and not HasPower and not _G.Stop then
+                    if not Library.Functions.CompareTable(_G.Wanted, PetToValidTable(GetPetInfo(v.uid).powers)) and not HasPower and not _G.Stop then
                         if #GetPetInfo(v.uid).powers > 1 then
                             warn('Pet: ', v.uid)
                             warn(GetPetInfo(v.uid).powers[1][1], GetPetInfo(v.uid).powers[1][2])
@@ -45,8 +50,8 @@ do--//AutoEnch
                         end
                         Library.Network.Invoke("Enchant Pet", v.uid)
                     else
-                        HasPower = true
                         warn("Pet: ", v.uid, " has wanted enchants.")
+                        HasPower = true
                     end
                     if Library.Save.Get().Diamonds < 500000 and _G.Stop ~= true and _G.AutoWithdraw then
                         Library.Network.Invoke('Bank withdraw', BUID, (function()
