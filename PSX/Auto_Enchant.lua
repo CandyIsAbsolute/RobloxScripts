@@ -57,7 +57,7 @@ do--//AutoEnch
                         local secs = math.floor(timeTook)
                         timeTook = timeTook - secs
                         local ms = math.floor(timeTook * 1000)
-                        warn('Pet: '..v.nk..'('..v.uid..')'.." has wanted enchants. It took:", string.format("%d:%d.%d", mins, secs, ms))
+                        warn('Pet: '..v.nk..'('..v.uid..')'.." has wanted enchants. It took:", string.format("%d Minutes, %d seconds, and %d milliseconds", mins, secs, ms))
                         HasPower = true
                     end
                     if Library.Save.Get().Diamonds < 500000 and _G.Stop ~= true and _G.AutoWithdraw then
@@ -75,3 +75,4 @@ do--//AutoEnch
         end
     end
 end
+
