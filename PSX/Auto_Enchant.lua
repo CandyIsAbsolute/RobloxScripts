@@ -3,8 +3,7 @@ local Library, Blacklist, BUID, BankInfo, Functions
 if _G.Stop == nil then
 	_G.Stop = false
 end
-
-_G.Stop = not _G.stop
+_G.Stop = not _G.Stop
 do--//Init
 	repeat
 		wait(1)
