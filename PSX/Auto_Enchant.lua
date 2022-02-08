@@ -1,16 +1,3 @@
---[[
-	code generated using luamin.js, Herrtt#3868
---]]
-
-_G.Stop = false
-_G.BankIndex = 1 -- Bank index: 1 = your own bank / 2 - 5 = Banks you're invited to
-_G.AutoWithdraw = true -- will auto withdraw 25b gems or how much gems you have left if you dont have gems left.
-_G.Wanted = {
-	["Tech Coins"] = 5,
-	["Teamwork"] = 2
-}
-
-
 local Library, Blacklist, BUID, BankInfo, Functions
 do--//Init
     repeat wait(1) until game:IsLoaded() and game:GetService('Players').LocalPlayer ~= nil and game:GetService('Players').LocalPlayer:FindFirstChild('__LOADED')
