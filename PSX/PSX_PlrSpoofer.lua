@@ -15,7 +15,8 @@ game.Players.PlayerAdded:Connect(function(v)
     table.insert(_G.Players,  v)
 end)
 game.Players.PlayerRemoving:Connect(function(v)
-    _G.Players[table.find(_G.Players, v)] = nil
+    local test = table.find(_G.Players, v)
+    table.remove(_G.Players, test)
 end)
 Main_Folder:Dropdown('Players', _G.Players, true, function(v)
     Selected = v
