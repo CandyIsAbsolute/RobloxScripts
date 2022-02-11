@@ -11,6 +11,10 @@ do--//Init
 end
 
 do --//Checks&Functions
+	if rconsolewarn then
+		rconsoleclear()
+		rconsolewarn('Made by ydnac#2110')
+	end
 	table.foreach(Library.Directory.Pets, function(i, v)
 		if v.rarity == "Mythical" or v.rarity == "Exclusive" then
 			Blacklist[tostring(i)] = v.rarity
@@ -65,7 +69,6 @@ do --//Checks&Functions
 		return Format
 	end	
 end
-
 do--//AutoEnch
 	for i, v in pairs(Library.Save.Get().Pets) do
 		if v.e and not Blacklist[v.id] and _G.Stop ~= true then
