@@ -1,29 +1,31 @@
-local UI_Lib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wall%20v3')))()
-local Psx_Lib = require(game:GetService('ReplicatedStorage').Framework.Library)
+local uiLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wally2", true))()
+local psxLib = require(game:GetService('ReplicatedStorage').Framework.Library)
+local mainWindow = uiLib:CreateWindow('Player Spoofer')
 
-local Main_Window = UI_Lib:CreateWindow('Player Spoofer')
-local Main_Folder = Main_Window:CreateFolder('ydnac#2110')
+do
+    local plrs = {}
+    mainWindow:Section('ydnac#2110')
+    mainWindow:Dropdown('Players', {
+        flag = "selectedPlr",
+        list = plrs
+    })
 
-_G.Players = {}
-local Selected
-table.foreach(game.Players:GetChildren(), function(i, v)
-    if v ~= game.Players.LocalPlayer then
-        table.insert(_G.Players,  v)
+    mainWindow:Button('Spoof', function()
+        game:GetService("ReplicatedStorage").Framework.Modules["2 | Network"]["new stats"]:Fire(psxLib.Network.Invoke('Get Stats', game:GetService('Players')[mainWindow.flags.selectedPlr]), game.Players.LocalPlayer)
+    end)
+    mainWindow:Button('Un-Spoof', function()
+        game:GetService("ReplicatedStorage").Framework.Modules["2 | Network"]["new stats"]:Fire(psxLib.Network.Invoke('Get Stats', game.Players.LocalPlayer), game.Players.LocalPlayer)
+    end)
+
+    for _,v in next, game:GetService('Players'):GetPlayers() do
+        if v ~= game:GetService('Players').LocalPlayer then
+            table.insert(plrs, tostring(v))
+        end
     end
-end)
-game.Players.PlayerAdded:Connect(function(v)
-    table.insert(_G.Players,  v)
-end)
-game.Players.PlayerRemoving:Connect(function(v)
-    local test = table.find(_G.Players, v)
-    table.remove(_G.Players, test)
-end)
-Main_Folder:Dropdown('Players', _G.Players, true, function(v)
-    Selected = v
-end)
-Main_Folder:Button('Spoof Player', function()
-    game:GetService("ReplicatedStorage").Framework.Modules["2 | Network"]["new stats"]:Fire(Psx_Lib.Save.Get(game.Players[Selected]), game.Players.LocalPlayer)
-end)
-Main_Folder:Button('Un-Spoof Player', function()
-    game:GetService("ReplicatedStorage").Framework.Modules["2 | Network"]["new stats"]:Fire(Psx_Lib.Network.Invoke('Get Stats', game.Players.LocalPlayer), game.Players.LocalPlayer)
-end)
+    game:GetService('Players').PlayerAdded:Connect(function(v)
+        table.insert(plrs, tostring(v))
+    end)
+    game:GetService('Players').PlayerRemoving:Connect(function(v)
+        table.remove(plrs, table.find(plrs, tostring(v)))
+    end)
+end
