@@ -6,7 +6,6 @@ do--//Init
 	Library     = require(game:GetService('ReplicatedStorage').Framework:FindFirstChild('Library'))
 	Functions   = Library.Functions
 	Blacklist   = {}
-	BankInfo    = Library.Network.Invoke('Get Bank', BUID)
 end
 
 do --//Checks&Functions
@@ -14,7 +13,12 @@ do --//Checks&Functions
 		rconsoleclear()
 		rconsolewarn('Made by ydnac#2110')
 	end
-	if Library.Network.Invoke('Get my Banks')[_G.BankIndex] == nil then _G.AutoWithdraw = false end
+	if Library.Network.Invoke('Get my Banks')[_G.BankIndex] == nil then
+		_G.AutoWithdraw = false
+	else
+		BUID = Library.Network.Invoke('Get my Banks')[_G.BankIndex].BUID;
+		BankInfo = Library.Network.Invoke('Get Bank', BUID)
+	end
 	table.foreach(Library.Directory.Pets, function(i, v)
 		if v.rarity == "Mythical" or v.rarity == "Exclusive" then
 			Blacklist[tostring(i)] = v.rarity
@@ -90,7 +94,7 @@ do--//AutoEnch
 						Library.Network.Invoke("Enchant Pet", v.uid)
 					else
 						local printwith = rconsolewarn or warn
-						printwith('Pet: ' .. v.nk .. '(' .. v.uid .. ')' .. " has wanted enchants. It took: "..tostring(Time(startTime)))
+						printwith('Pet: ' .. v.nk .. '(' .. v.uid .. ')' .. " has wanted enchants. It took: " .. tostring(Time(startTime)))
 						HasPower = true
 					end
 					if Library.Save.Get().Diamonds < 500000 and _G.Stop ~= true and _G.AutoWithdraw then
