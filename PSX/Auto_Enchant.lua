@@ -6,7 +6,6 @@ do--//Init
 	Library     = require(game:GetService('ReplicatedStorage').Framework:FindFirstChild('Library'))
 	Functions   = Library.Functions
 	Blacklist   = {}
-	BUID        = Library.Network.Invoke('Get my Banks')[_G.BankIndex] 
 	BankInfo    = Library.Network.Invoke('Get Bank', BUID)
 end
 
@@ -15,7 +14,7 @@ do --//Checks&Functions
 		rconsoleclear()
 		rconsolewarn('Made by ydnac#2110')
 	end
-	if BUID == nil then _G.AutoWithdraw = false else BUID = BUID.BUID end
+	if Library.Network.Invoke('Get my Banks')[_G.BankIndex] == nil then _G.AutoWithdraw = false end
 	table.foreach(Library.Directory.Pets, function(i, v)
 		if v.rarity == "Mythical" or v.rarity == "Exclusive" then
 			Blacklist[tostring(i)] = v.rarity
