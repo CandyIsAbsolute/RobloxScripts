@@ -10,7 +10,7 @@ local chr = player.Character
 local library = loadstring(game:HttpGet("https://pastebin.com/raw/ikz1WLPr", true))()
 
 local npcFarm = library:CreateWindow("NPC Farm")
---local itemFarm = library:CreateWindow("Item Farm")
+local itemFarm = library:CreateWindow("Item Farm")
 
 local options = {
     npcFarm = {
@@ -33,12 +33,15 @@ do --update stuff
     bAngularVelocity:Clone().Parent = chr.HumanoidRootPart
 
     player.CharacterAdded:Connect(function(v)
-
         chr = v
         bVelocity:Clone().Parent = v:WaitForChild("HumanoidRootPart", 9e99)
         bAngularVelocity:Clone().Parent = v:WaitForChild("HumanoidRootPart", 9e99)
-
     end)
+    for _,v in next, game:GetService('Workspace'):GetDescendants() do
+        if v:IsA('Seat') then
+            v:Destroy()
+        end
+    end
 end
 
 do --npcFarm
@@ -57,27 +60,27 @@ do --npcFarm
     end
 
     npcFarm:Section("")
-    local toggle = npcFarm:Toggle("Enabled", {
+    toggleNPCFarm = npcFarm:Toggle("Enabled", {
         location = options.npcFarm,
         flag = "enabled"
     }, function()
         task.spawn(startNpcFarm)
         if options.npcFarm.enabled then
-            chr:FindFirstChild('HumanoidRootPart').bV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
-            chr:FindFirstChild('HumanoidRootPart').bAV.MaxTorque = Vector3.new(1/0, 1/0, 1/0)
+            chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
+            chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new(1/0, 1/0, 1/0)
         else
-            chr:FindFirstChild('HumanoidRootPart').bV.MaxForce = Vector3.new()
-            chr:FindFirstChild('HumanoidRootPart').bAV.MaxTorque = Vector3.new()
+            chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
+            chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
         end
+        if options.itemFarm.enabled then toggleItemFarm:Set(false) end
     end)
-
     npcFarm:Section("")
     local distance = npcFarm:Slider("Distance", {
         location = options.npcFarm,
         flag = "selectedDistance",
         min = 1, 
-        max = 20,
         default = 8,
+        max = 20,
     })
     npcFarm:Section("")
     local enemy = npcFarm:Dropdown("Enemy", {
@@ -108,12 +111,12 @@ do --npcFarm
                 if chr:FindFirstChild("Summoned").Value == false then
                     repeat wait() 
                         ability:FireServer("Stand Summon", {})
-                    until chr:FindFirstChild("Summoned").Value == true and chr:FindFirstChild('Stand').HumanoidRootPart ~= nil
+                    until chr:FindFirstChild("Summoned").Value == true and chr:FindFirstChild("Stand").HumanoidRootPart ~= nil
                 end
                 useAbilities()
-                if enemy:FindFirstChild('Humanoid') ~= nil and enemy.Humanoid.Health < 1 then
+                if enemy:FindFirstChild("Humanoid") ~= nil and enemy.Humanoid.Health < 1 then
                     for _,v in next, game:GetService("Workspace").Alive:GetChildren() do
-                        if v:WaitForChild('Humanoid').Health > 0 and tostring(v) == tostring(enemy) then
+                        if v:WaitForChild("Humanoid").Health > 0 and tostring(v) == tostring(enemy) then
                             options.npcFarm.selectedEnemy = v
                             break
                         end
@@ -133,13 +136,46 @@ do --npcFarm
             if v == true then
                 if tostring(i) == "punch" then
                     for i=1, 3 do
-                        ability:FireServer('Punch', {})
+                        ability:FireServer("Punch", {})
                         wait()
                     end
                 elseif tostring(i) == "barrage" then
-                    ability:FireServer('Barrage', {true, 'Hand'})
+                    ability:FireServer("Barrage", {true, "Hand"})
                 else
                     presskey(i, 0)
+                end
+            end
+        end
+    end
+end
+do
+    itemFarm:Section("")
+    toggleItemFarm = itemFarm:Toggle("Enabled", {
+        location = options.itemFarm,
+        flag = "enabled"
+    }, function()
+        print('?')
+        spawn(startItemFarm)
+        if options.npcFarm.enabled then toggleNPCFarm:Set(false) end
+    end)
+    itemFarm:Section("")
+    local speed = itemFarm:Slider("Speed", {
+        location = options.itemFarm,
+        flag = "selectedSpeed",
+        min = 30,
+        default = 60,
+        max = 240
+    })
+    itemFarm:Section("")
+
+    function startItemFarm()
+        while options.itemFarm.enabled do
+            if options.npcFarm.enabled then toggleNPCFarm:Set(false) end
+            for i, v in next, game:GetService('Workspace'):GetChildren() do
+                if v:FindFirstChild('Handler') and not v:IsA('Model') and v:FindFirstChildOfClass('TouchTransmitter') then
+                    local anim = tweenService:Create(chr.HumanoidRootPart, TweenInfo.new((chr.HumanoidRootPart.Position - v.Position).Magnitude / options.itemFarm.selectedSpeed), {CFrame = v.CFrame})
+                    anim:Play()
+                    anim.Completed:wait()
                 end
             end
         end
