@@ -172,6 +172,9 @@ do
         while options.itemFarm.enabled do
             if options.npcFarm.enabled then toggleNPCFarm:Set(false) end
             for i, v in next, game:GetService('Workspace'):GetChildren() do
+                if options.npcFarm.enabled then
+                    break
+                end
                 if v:FindFirstChild('Handler') and not v:IsA('Model') and v:FindFirstChildOfClass('TouchTransmitter') then
                     local anim = tweenService:Create(chr.HumanoidRootPart, TweenInfo.new((chr.HumanoidRootPart.Position - v.Position).Magnitude / options.itemFarm.selectedSpeed), {CFrame = v.CFrame})
                     anim:Play()
