@@ -95,6 +95,7 @@ do --npcFarm
     npcFarm:Toggle("H", {location = options.npcFarm.abilities, flag = "H"})
     npcFarm:Toggle("J", {location = options.npcFarm.abilities, flag = "J"})
     npcFarm:Toggle("Z", {location = options.npcFarm.abilities, flag = "Z"})
+    npcFarm:Toggle("X", {location = options.npcFarm.abilities, flag = "X"})
     npcFarm:Section("")
 
     function startNpcFarm()
