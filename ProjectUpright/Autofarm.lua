@@ -1,7 +1,7 @@
 
 local library = loadstring(game:HttpGet("https://pastebin.com/raw/AN3u83ts", true))()
 
-local mainWindow = library:CreateWindow('Example')
+local mainWindow = library:CreateWindow('got damn')
 
 local Options = {}
 
@@ -99,7 +99,7 @@ do
 		while task.wait() do
 			chr = game:GetService('Players').LocalPlayer.Character
 			if Options.enabled and chr:FindFirstChild('HumanoidRootPart') ~= nil then
-				chr.HumanoidRootPart.CFrame = CFrame.new(Options.selectedEnemy.HumanoidRootPart.Position.X, Options.selectedEnemy.HumanoidRootPart.Position.Y + Options.selectedDistance, Options.selectedEnemy.HumanoidRootPart.Position.Z) * CFrame.Angles(-math.rad(90), 0, -math.rad(180))
+				chr.HumanoidRootPart.CFrame = CFrame.new(Options.selectedEnemy:WaitForChild('HumanoidRootPart').Position.X, Options.selectedEnemy.HumanoidRootPart.Position.Y + Options.selectedDistance, Options.selectedEnemy.HumanoidRootPart.Position.Z) * CFrame.Angles(-math.rad(90), 0, -math.rad(180))
 				task.spawn(useAbility)
                 if not chr:FindFirstChild('Summoned').Value == true then
                     local virtualInputManager = game:GetService('VirtualInputManager')
