@@ -1,11 +1,12 @@
 
-local library = loadstring(game:HttpGet("https://pastebin.com/raw/AN3u83ts", true))()
+local library = loadstring(game:HttpGet("https://pastebin.com/raw/ikz1WLPr", true))()
 
-local mainWindow = library:CreateWindow('got damn')
+local mainWindow = library:CreateWindow('i love men')
 
 local Options = {}
 
 local Enemies = {}
+
 local Abilities = {
 	["Ab_MB1"] = "rep-3",
 	["Ab_E"] = "hold-6",
@@ -22,15 +23,19 @@ do
 		mainWindow:Toggle('Enabled', {
 			location = Options,
 			flag = "enabled"
+		})
+		mainWindow:Bind('Keybind', {
+			location = Options,
+			flag = "keybind",
+			kbonly = true,
+			default = Enum.KeyCode.Semicolon
 		}, function()
-            if Options.enabled then
-                oldpos = game:GetService('Players').LocalPlayer.Character.HumanoidRootPart.CFrame
-            else
-                local anim = game:GetService('TweenService'):Create(game:GetService('Players').LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(2), {CFrame = oldpos})
-                anim:Play()
-                anim.Completed:Wait()
-            end
-        end)
+			if typeof(Options.selectedEnemy) ~= "Instance" then 
+				Options.selectedEnemy = Enemies[1]
+				print(typeof(Options.selectedEnemy))
+			end
+			Options.enabled = not Options.enabled
+		end)
 	end
 	mainWindow:Section('')
 	do
@@ -59,7 +64,13 @@ do
 		end
 	end
 end
+
 do
+	local bVelocity = Instance.new('BodyVelocity')
+	bVelocity.MaxForce = Vector3.new()
+	bVelocity.Velocity = Vector3.new()
+	bVelocity.Name = "bV"
+	bVelocity:Clone().Parent = game:GetService('Players').LocalPlayer.Character.HumanoidRootPart
 	task.spawn(function()
 		for _, v in next, game:GetService("Workspace").Alive:GetChildren() do
 			table.insert(Enemies, v)
@@ -69,6 +80,9 @@ do
 		end)
 		game:GetService("Workspace").Alive.ChildRemoved:connect(function(v)
 			table.remove(Enemies, table.find(Enemies, v))
+		end)
+		game:GetService('Players').LocalPlayer.CharacterAdded:Connect(function(v)
+			bVelocity:Clone().Parent = v:WaitForChild('HumanoidRootPart')
 		end)
 	end)
 	task.spawn(function()
@@ -98,16 +112,17 @@ do
 		end
 		while task.wait() do
 			chr = game:GetService('Players').LocalPlayer.Character
-			if Options.enabled and chr:FindFirstChild('HumanoidRootPart') ~= nil then
+			if Options.enabled and chr:FindFirstChild('HumanoidRootPart') ~= nil and chr ~= nil then
+				chr.HumanoidRootPart.bV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
 				chr.HumanoidRootPart.CFrame = CFrame.new(Options.selectedEnemy:WaitForChild('HumanoidRootPart').Position.X, Options.selectedEnemy.HumanoidRootPart.Position.Y + Options.selectedDistance, Options.selectedEnemy.HumanoidRootPart.Position.Z) * CFrame.Angles(-math.rad(90), 0, -math.rad(180))
 				task.spawn(useAbility)
                 if not chr:FindFirstChild('Summoned').Value == true then
                     local virtualInputManager = game:GetService('VirtualInputManager')
                     repeat
                         virtualInputManager:SendKeyEvent(true, Enum.KeyCode.Q, false, game)
-                        wait()
+                        wait(1)
                         virtualInputManager:SendKeyEvent(false, Enum.KeyCode.Q, false, game)
-                    until chr:FindFirstChild('Summoned').Value == true
+                    until chr:FindFirstChild('Summoned').Value == true and chr:FindFirstChild('Stand').HumanoidRootPart ~= nil
                 end
                 if 1 > Options.selectedEnemy.Humanoid.Health then
                     for _,v in next, game:GetService("Workspace").Alive:GetChildren() do
@@ -117,6 +132,8 @@ do
                         end
                     end
                 end
+			else
+				chr.HumanoidRootPart.bV.MaxForce = Vector3.new()
 			end
 		end
 	end)
