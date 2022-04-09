@@ -72,7 +72,7 @@ do --npcFarm
             chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
             chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
         end
-        if options.itemFarm.enabled then toggleItemFarm:Set(false) end
+        if options.itemFarm.enabled then toggleItemFarm:Set(false) toggleNPCFarm:Set(true) end
     end)
     npcFarm:Section("")
     local distance = npcFarm:Slider("Distance", {
@@ -156,7 +156,7 @@ do
     }, function()
         print('?')
         spawn(startItemFarm)
-        if options.npcFarm.enabled then toggleNPCFarm:Set(false) end
+        if options.npcFarm.enabled then toggleNPCFarm:Set(false) toggleItemFarm:Set(true) end
     end)
     itemFarm:Section("")
     local speed = itemFarm:Slider("Speed", {
@@ -172,7 +172,7 @@ do
         while options.itemFarm.enabled do wait()
             if options.npcFarm.enabled then toggleNPCFarm:Set(false) end
             for i, v in next, game:GetService('Workspace'):GetChildren() do
-                if options.npcFarm.enabled then
+                if options.npcFarm.enabled == true then
                     break
                 end
                 if v:FindFirstChild('Handler') and not v:IsA('Model') and v:FindFirstChildOfClass('TouchTransmitter') then
