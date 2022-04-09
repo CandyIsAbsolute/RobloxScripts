@@ -72,7 +72,7 @@ do --npcFarm
             chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
             chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
         end
-        if options.itemFarm.enabled then toggleItemFarm:Set(false) toggleNPCFarm:Set(true) end
+        if options.itemFarm.enabled then toggleItemFarm:Set(false)  end
     end)
     npcFarm:Section("")
     local distance = npcFarm:Slider("Distance", {
@@ -156,7 +156,7 @@ do
     }, function()
         print('?')
         spawn(startItemFarm)
-        if options.npcFarm.enabled then toggleNPCFarm:Set(false) toggleItemFarm:Set(true) end
+        if options.npcFarm.enabled then toggleNPCFarm:Set(false) end
     end)
     itemFarm:Section("")
     local speed = itemFarm:Slider("Speed", {
