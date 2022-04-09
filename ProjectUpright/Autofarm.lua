@@ -72,7 +72,7 @@ do --npcFarm
             chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
             chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
         end
-        if options.itemFarm.enabled then toggleItemFarm:Set(false)  end
+        if options.itemFarm.enabled then toggleItemFarm:Set(false) end
     end)
     npcFarm:Section("")
     local distance = npcFarm:Slider("Distance", {
@@ -111,7 +111,7 @@ do --npcFarm
                 if chr:FindFirstChild("Summoned").Value == false then
                     repeat wait() 
                         ability:FireServer("Stand Summon", {})
-                    until chr:FindFirstChild("Summoned").Value == true and chr:FindFirstChild("Stand").HumanoidRootPart ~= nil
+                    until chr:FindFirstChild("Summoned").Value == true and chr:FindFirstChild("Stand"):WaitForChild('HumanoidRootPart') ~= nil
                 end
                 useAbilities()
                 if enemy:FindFirstChild("Humanoid") ~= nil and enemy.Humanoid.Health < 1 then
@@ -148,7 +148,7 @@ do --npcFarm
         end
     end
 end
-do
+do --item farm
     itemFarm:Section("")
     toggleItemFarm = itemFarm:Toggle("Enabled", {
         location = options.itemFarm,
