@@ -265,11 +265,12 @@ local defaults; do
                 Parent = self.container;
             });
             
-            check:FindFirstChild(name).MouseButton1Click:connect(callback)
+            check:FindFirstChild(name).MouseButton1Click:connect(function()
+                callback(check)
+            end)
             self:Resize();
 
             return {
-                Self = check:FindFirstChild(name),
                 Fire = function()
                     callback();
                 end,
