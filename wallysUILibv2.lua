@@ -166,6 +166,8 @@ local defaults; do
             self.container.Size = UDim2.new(1, 0, 0, y+5)
         end
         
+        
+
         function types:GetOrder() 
             local c = 0;
             for i, v in next, self.container:GetChildren() do
@@ -267,11 +269,9 @@ local defaults; do
             self:Resize();
 
             return {
+                Self = check:FindFirstChild(name),
                 Fire = function()
                     callback();
-                end,
-                Fired = function(func)
-                    return check:FindFirstChild(name).MouseButton1Click:connect(func(check))
                 end,
             }
         end
