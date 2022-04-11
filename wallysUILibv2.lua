@@ -1,5 +1,3 @@
--- forked by SharKK | SharKK#1954
-
 local library = {count = 0, queue = {}, callbacks = {}, rainbowtable = {}, toggled = true, binds = {}};
 local defaults; do
     local dragger = {}; do
@@ -791,7 +789,6 @@ local defaults; do
 
                 box:FindFirstChild('Box').Text = location[flag]
                 box:FindFirstChild('Box').TextColor3 = library.options.textcolor
-                game:GetService('Debris'):AddItem(container, 0)
             end
             self:Resize();
             
