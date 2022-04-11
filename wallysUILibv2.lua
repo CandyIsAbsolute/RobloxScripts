@@ -799,7 +799,7 @@ local defaults; do
                 Refresh = reload,
                 Set = function(self, b)
                     location[flag] = b;
-                    box:FindFirstChild('Box').Text = location[flag] and utf8.char(10003) or "";
+                    box:FindFirstChild('Box').Text = location[flag]
                 end
             }
         end
