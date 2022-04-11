@@ -265,6 +265,7 @@ local defaults; do
             
             check:FindFirstChild(name).MouseButton1Click:connect(function()
                 callback(check)
+                self:Resize()
             end)
             self:Resize();
 
