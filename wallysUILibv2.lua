@@ -1,349 +1,1084 @@
-local tweenService = game:GetService("TweenService")
-local vim = game:GetService("VirtualInputManager")
-local ability = game:GetService("ReplicatedStorage"):FindFirstChild("Ability")
-local spawn, wait = task.spawn, task.wait 
+-- forked by SharKK | SharKK#1954
 
-local player = game:GetService("Players").LocalPlayer
-local chr = player.Character
-
-
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/CandyIsAbsolute/RobloxScripts/main/wallysUILibv2.lua", true))()
-
-local npcFarm = library:CreateWindow("NPC Farm")
-local itemFarm = library:CreateWindow("Item Farm")
-local standFarm = library:CreateWindow("Stand Farm")
-local standFarmConfigs = library:CreateWindow("Configs")
-
-
-local options = {
-    npcFarm = {
-        abilities = {}
-    },
-    itemFarm = {},
-    standFarm = {}
-}
-
-do --update stuff
-    local bVelocity = Instance.new("BodyVelocity")
-	bVelocity.MaxForce = Vector3.new()
-	bVelocity.Velocity = Vector3.new()
-	bVelocity.Name = "bV"
-    local bAngularVelocity = Instance.new("BodyAngularVelocity")
-    bAngularVelocity.AngularVelocity = Vector3.new()
-    bAngularVelocity.MaxTorque = Vector3.new()
-    bAngularVelocity.Name = "bAV"
-
-	bVelocity:Clone().Parent = chr.HumanoidRootPart
-    bAngularVelocity:Clone().Parent = chr.HumanoidRootPart
-
-    player.CharacterAdded:Connect(function(v)
-        chr = v
-        bVelocity:Clone().Parent = v:WaitForChild("HumanoidRootPart", 9e99)
-        bAngularVelocity:Clone().Parent = v:WaitForChild("HumanoidRootPart", 9e99)
-    end)
-    for _,v in next, game:GetService("Workspace"):GetDescendants() do
-        if v:IsA("Seat") then
-            v:Destroy()
-        end
-    end
-end
-do --npc Farm
-    local enemies = {}
-
-    do--update enemies
-        for _, v in next, game:GetService("Workspace").Alive:GetChildren() do
-            enemies[v] = v
-		end
-		game:GetService("Workspace").Alive.ChildAdded:connect(function(v)
-            enemies[v] = v
-		end)
-		game:GetService("Workspace").Alive.ChildRemoved:connect(function(v)
-			table.remove(enemies, table.find(enemies, v))
-		end)
-    end
-
-    npcFarm:Section("")
-    toggleNPCFarm = npcFarm:Toggle("Enabled", {
-        location = options.npcFarm,
-        flag = "enabled"
-    }, function()
-        task.spawn(startNpcFarm)
-        if options.npcFarm.enabled then
-            chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
-            chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new(1/0, 1/0, 1/0)
-        else
-            chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
-            chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
-        end
-        if options.itemFarm.enabled then toggleItemFarm:Set(false) end
-        if options.standFarm.enabled then toggleNPCFarm:Set(false)  end
-    end)
-    npcFarm:Section("")
-    local distance = npcFarm:Slider("Distance", {
-        location = options.npcFarm,
-        flag = "selectedDistance",
-        min = 1, 
-        default = 8,
-        max = 20,
-    })
-    npcFarm:Section("")
-    local enemy = npcFarm:Dropdown("Enemy", {
-        location = options.npcFarm,
-        flag = "selectedEnemy",
-        list = enemies,
-    })
-    npcFarm:Section("")
-    npcFarm:Toggle("MB1", {location = options.npcFarm.abilities, flag = "punch"}):Set(true)
-    npcFarm:Toggle("E", {location = options.npcFarm.abilities, flag = "barrage"}):Set(true)
-    npcFarm:Toggle("R", {location = options.npcFarm.abilities, flag = "R"}):Set(true)
-    npcFarm:Toggle("T", {location = options.npcFarm.abilities, flag = "T"}):Set(true)
-    npcFarm:Toggle("Y", {location = options.npcFarm.abilities, flag = "Y"})
-    npcFarm:Toggle("F", {location = options.npcFarm.abilities, flag = "F"})
-    npcFarm:Toggle("H", {location = options.npcFarm.abilities, flag = "H"})
-    npcFarm:Toggle("J", {location = options.npcFarm.abilities, flag = "J"})
-    npcFarm:Toggle("Z", {location = options.npcFarm.abilities, flag = "Z"})
-    npcFarm:Toggle("X", {location = options.npcFarm.abilities, flag = "X"})
-    npcFarm:Section("")
-
-    function startNpcFarm()
-        while options.npcFarm.enabled == true do wait()
-            chr = player.Character
-            enemy = options.npcFarm.selectedEnemy
-            if chr ~= nil and enemy:FindFirstChild("HumanoidRootPart") ~= nil then
-                chr.HumanoidRootPart.CFrame = CFrame.new(enemy.HumanoidRootPart.Position.X, enemy.HumanoidRootPart.Position.Y + options.npcFarm.selectedDistance, enemy.HumanoidRootPart.Position.Z) * CFrame.Angles(-math.rad(90), 0, -math.rad(180))
+local library = {count = 0, queue = {}, callbacks = {}, rainbowtable = {}, toggled = true, binds = {}};
+local defaults; do
+    local dragger = {}; do
+        local mouse        = game:GetService("Players").LocalPlayer:GetMouse();
+        local inputService = game:GetService('UserInputService');
+        local heartbeat    = game:GetService("RunService").Heartbeat;
+        -- // credits to Ririchi / Inori for this cute drag function :)
+        function dragger.new(frame)
+            local s, event = pcall(function()
+                return frame.MouseEnter
+            end)
+    
+            if s then
+                frame.Active = true;
                 
-                if chr:FindFirstChild("Summoned").Value == false then
-                    repeat wait() 
-                        ability:FireServer("Stand Summon", {})
-                    until chr:FindFirstChild("Summoned").Value == true and chr:FindFirstChild("Stand"):WaitForChild("HumanoidRootPart") ~= nil
+                event:connect(function()
+                    local input = frame.InputBegan:connect(function(key)
+                        if key.UserInputType == Enum.UserInputType.MouseButton1 then
+                            local objectPosition = Vector2.new(mouse.X - frame.AbsolutePosition.X, mouse.Y - frame.AbsolutePosition.Y);
+                            while heartbeat:wait() and inputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
+                                pcall(function()
+                                    frame:TweenPosition(UDim2.new(0, mouse.X - objectPosition.X, 0, mouse.Y - objectPosition.Y), 'Out', 'Linear', 0.1, true);
+                                end)
+                            end
+                        end
+                    end)
+    
+                    local leave;
+                    leave = frame.MouseLeave:connect(function()
+                        input:disconnect();
+                        leave:disconnect();
+                    end)
+                end)
+            end
+        end
+
+
+        game:GetService('UserInputService').InputBegan:connect(function(key, gpe)
+            if (not gpe) then
+                if key.KeyCode == Enum.KeyCode.RightControl then
+                    library.toggled = not library.toggled;
+                    for i, data in next, library.queue do
+                        local pos = (library.toggled and data.p or UDim2.new(-1, 0, -0.5,0))
+                        data.w:TweenPosition(pos, (library.toggled and 'Out' or 'In'), 'Quad', 0.15, true)
+                        wait();
+                    end
                 end
-                useAbilities()
-                if enemy:FindFirstChild("Humanoid") ~= nil and enemy.Humanoid.Health < 1 then
-                    for _,v in next, game:GetService("Workspace").Alive:GetChildren() do
-                        if v:WaitForChild("Humanoid").Health > 0 and tostring(v) == tostring(enemy) then
-                            options.npcFarm.selectedEnemy = v
-                            break
+            end
+        end)
+    end
+    
+    local types = {}; do
+        types.__index = types;
+        function types.window(name, options)
+            library.count = library.count + 1
+            local newWindow = library:Create('Frame', {
+                Name = name;
+                Size = UDim2.new(0, 190, 0, 30);
+                BackgroundColor3 = options.topcolor;
+                BorderSizePixel = 0;
+                Parent = library.container;
+                Position = UDim2.new(0, (15 + (200 * library.count) - 200), 0, 0);
+                ZIndex = 3;
+                library:Create('TextLabel', {
+                    Text = name;
+                    Size = UDim2.new(1, -10, 1, 0);
+                    Position = UDim2.new(0, 5, 0, 0);
+                    BackgroundTransparency = 1;
+                    Font = Enum.Font.Code;
+                    TextSize = options.titlesize;
+                    Font = options.titlefont;
+                    TextColor3 = options.titletextcolor;
+                    TextStrokeTransparency = library.options.titlestroke;
+                    TextStrokeColor3 = library.options.titlestrokecolor;
+                    ZIndex = 3;
+                });
+                library:Create("TextButton", {
+                    Size = UDim2.new(0, 30, 0, 30);
+                    Position = UDim2.new(1, -35, 0, 0);
+                    BackgroundTransparency = 1;
+                    Text = "-";
+                    TextSize = options.titlesize;
+                    Font = options.titlefont;--Enum.Font.Code;
+                    Name = 'window_toggle';
+                    TextColor3 = options.titletextcolor;
+                    TextStrokeTransparency = library.options.titlestroke;
+                    TextStrokeColor3 = library.options.titlestrokecolor;
+                    ZIndex = 3;
+                });
+                library:Create("Frame", {
+                    Name = 'Underline';
+                    Size = UDim2.new(1, 0, 0, 2);
+                    Position = UDim2.new(0, 0, 1, -2);
+                    BackgroundColor3 = (options.underlinecolor ~= "rainbow" and options.underlinecolor or Color3.new());
+                    BorderSizePixel = 0;
+                    ZIndex = 3;
+                });
+                library:Create('Frame', {
+                    Name = 'container';
+                    Position = UDim2.new(0, 0, 1, 0);
+                    Size = UDim2.new(1, 0, 0, 0);
+                    BorderSizePixel = 0;
+                    BackgroundColor3 = options.bgcolor;
+                    ClipsDescendants = false;
+                    library:Create('UIListLayout', {
+                        Name = 'List';
+                        SortOrder = Enum.SortOrder.LayoutOrder;
+                    })
+                });
+            })
+            
+            if options.underlinecolor == "rainbow" then
+                table.insert(library.rainbowtable, newWindow:FindFirstChild('Underline'))
+            end
+
+            local window = setmetatable({
+                count = 0;
+                object = newWindow;
+                container = newWindow.container;
+                toggled = true;
+                flags   = {};
+
+            }, types)
+
+            table.insert(library.queue, {
+                w = window.object;
+                p = window.object.Position;
+            })
+
+            newWindow:FindFirstChild("window_toggle").MouseButton1Click:connect(function()
+                window.toggled = not window.toggled;
+                newWindow:FindFirstChild("window_toggle").Text = (window.toggled and "+" or "-")
+                if (not window.toggled) then
+                    window.container.ClipsDescendants = true;
+                end
+                wait();
+                local y = 0;
+                for i, v in next, window.container:GetChildren() do
+                    if (not v:IsA('UIListLayout')) then
+                        y = y + v.AbsoluteSize.Y;
+                    end
+                end 
+
+                local targetSize = window.toggled and UDim2.new(1, 0, 0, y+5) or UDim2.new(1, 0, 0, 0);
+                local targetDirection = window.toggled and "In" or "Out"
+
+                window.container:TweenSize(targetSize, targetDirection, "Quint", .3, true)
+                wait(.3)
+                if window.toggled then
+                    window.container.ClipsDescendants = false;
+                end
+            end)
+
+            return window;
+        end
+        
+        function types:Resize()
+            local y = 0;
+            for i, v in next, self.container:GetChildren() do
+                if (not v:IsA('UIListLayout')) then
+                    y = y + v.AbsoluteSize.Y;
+                end
+            end 
+            self.container.Size = UDim2.new(1, 0, 0, y+5)
+        end
+        
+        
+
+        function types:GetOrder() 
+            local c = 0;
+            for i, v in next, self.container:GetChildren() do
+                if (not v:IsA('UIListLayout')) then
+                    c = c + 1
+                end
+            end
+            return c
+        end
+        
+        function types:Toggle(name, options, callback)
+            local default  = options.default or false;
+            local location = options.location or self.flags;
+            local flag     = options.flag or "";
+            local callback = callback or function() end;
+            
+            location[flag] = default;
+
+            local check = library:Create('Frame', {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(1, 0, 0, 25);
+                LayoutOrder = self:GetOrder();
+                library:Create('TextLabel', {
+                    Name = name;
+                    Text = "\r" .. name;
+                    BackgroundTransparency = 1;
+                    TextColor3 = library.options.textcolor;
+                    Position = UDim2.new(0, 5, 0, 0);
+                    Size     = UDim2.new(1, -5, 1, 0);
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                    Font = library.options.font;
+                    TextSize = library.options.fontsize;
+                    TextStrokeTransparency = library.options.textstroke;
+                    TextStrokeColor3 = library.options.strokecolor;
+                    library:Create('TextButton', {
+                        Text = (location[flag] and utf8.char(10003) or "");
+                        Font = library.options.font;
+                        TextSize = library.options.fontsize;
+                        Name = 'Checkmark';
+                        Size = UDim2.new(0, 20, 0, 20);
+                        Position = UDim2.new(1, -25, 0, 4);
+                        TextColor3 = library.options.textcolor;
+                        BackgroundColor3 = library.options.bgcolor;
+                        BorderColor3 = library.options.bordercolor;
+                        TextStrokeTransparency = library.options.textstroke;
+                        TextStrokeColor3 = library.options.strokecolor;
+                    })
+                });
+                Parent = self.container;
+            });
+                
+            local function click(t)
+                location[flag] = not location[flag];
+                callback(location[flag])
+                check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
+            end
+
+            check:FindFirstChild(name).Checkmark.MouseButton1Click:connect(click)
+            library.callbacks[flag] = click;
+
+            if location[flag] == true then
+                callback(location[flag])
+            end
+
+            self:Resize();
+            return {
+                Set = function(self, b)
+                    location[flag] = b;
+                    callback(location[flag])
+                    check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
+                end
+            }
+        end
+        
+        function types:Button(name, callback)
+            callback = callback or function() end;
+            
+            local check = library:Create('Frame', {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(1, 0, 0, 25);
+                LayoutOrder = self:GetOrder();
+                library:Create('TextButton', {
+                    Name = name;
+                    Text = name;
+                    BackgroundColor3 = library.options.btncolor;
+                    BorderColor3 = library.options.bordercolor;
+                    TextStrokeTransparency = library.options.textstroke;
+                    TextStrokeColor3 = library.options.strokecolor;
+                    TextColor3 = library.options.textcolor;
+                    Position = UDim2.new(0, 5, 0, 5);
+                    Size     = UDim2.new(1, -10, 0, 20);
+                    Font = library.options.font;
+                    TextSize = library.options.fontsize;
+                });
+                Parent = self.container;
+            });
+            
+            check:FindFirstChild(name).MouseButton1Click:connect(function()
+                callback(check)
+            end)
+            self:Resize();
+
+            return {
+                Fire = function()
+                    callback();
+                end,
+            }
+        end
+        
+        function types:Box(name, options, callback) --type, default, data, location, flag)
+            local type   = options.type or "";
+            local default = options.default or "";
+            local data = options.data
+            local location = options.location or self.flags;
+            local flag     = options.flag or "";
+            local callback = callback or function() end;
+            local min      = options.min or 0;
+            local max      = options.max or 9e9;
+
+            if type == 'number' and (not tonumber(default)) then
+                location[flag] = default;
+            else
+                location[flag] = "";
+                default = "";
+            end
+
+            local check = library:Create('Frame', {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(1, 0, 0, 25);
+                LayoutOrder = self:GetOrder();
+                library:Create('TextLabel', {
+                    Name = name;
+                    Text = "\r" .. name;
+                    BackgroundTransparency = 1;
+                    TextColor3 = library.options.textcolor;
+                    TextStrokeTransparency = library.options.textstroke;
+                    TextStrokeColor3 = library.options.strokecolor;
+                    Position = UDim2.new(0, 5, 0, 0);
+                    Size     = UDim2.new(1, -5, 1, 0);
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                    Font = library.options.font;
+                    TextSize = library.options.fontsize;
+                    library:Create('TextBox', {
+                        TextStrokeTransparency = library.options.textstroke;
+                        TextStrokeColor3 = library.options.strokecolor;
+                        Text = tostring(default);
+                        Font = library.options.font;
+                        TextSize = library.options.fontsize;
+                        Name = 'Box';
+                        Size = UDim2.new(0, 60, 0, 20);
+                        Position = UDim2.new(1, -65, 0, 3);
+                        TextColor3 = library.options.textcolor;
+                        BackgroundColor3 = library.options.boxcolor;
+                        BorderColor3 = library.options.bordercolor;
+                        PlaceholderColor3 = library.options.placeholdercolor;
+                    })
+                });
+                Parent = self.container;
+            });
+        
+            local box = check:FindFirstChild(name):FindFirstChild('Box');
+            box.FocusLost:connect(function(e)
+                local old = location[flag];
+                if type == "number" then
+                    local num = tonumber(box.Text)
+                    if (not num) then
+                        box.Text = tonumber(location[flag])
+                    else
+                        location[flag] = math.clamp(num, min, max)
+                        box.Text = tonumber(location[flag])
+                    end
+                else
+                    location[flag] = tostring(box.Text)
+                end
+
+                callback(location[flag], old, e)
+            end)
+            
+            if type == 'number' then
+                box:GetPropertyChangedSignal('Text'):connect(function()
+                    box.Text = string.gsub(box.Text, "[%a+]", "");
+                end)
+            end
+            
+            self:Resize();
+            return box
+        end
+        
+        function types:Bind(name, options, callback)
+            local location     = options.location or self.flags;
+            local keyboardOnly = options.kbonly or false
+            local flag         = options.flag or "";
+            local callback     = callback or function() end;
+            local default      = options.default;
+
+            if keyboardOnly and (not tostring(default):find('MouseButton')) then
+                location[flag] = default
+            end
+            
+            local banned = {
+                Return = true;
+                Space = true;
+                Tab = true;
+                Unknown = true;
+            }
+            
+            local shortNames = {
+                RightControl = 'RightCtrl';
+                LeftControl = 'LeftCtrl';
+                LeftShift = 'LShift';
+                RightShift = 'RShift';
+                MouseButton1 = "Mouse1";
+                MouseButton2 = "Mouse2";
+            }
+            
+            local allowed = {
+                MouseButton1 = true;
+                MouseButton2 = true;
+            }      
+
+            local nm = (default and (shortNames[default.Name] or default.Name) or "None");
+            local check = library:Create('Frame', {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(1, 0, 0, 30);
+                LayoutOrder = self:GetOrder();
+                library:Create('TextLabel', {
+                    Name = name;
+                    Text = "\r" .. name;
+                    BackgroundTransparency = 1;
+                    TextColor3 = library.options.textcolor;
+                    Position = UDim2.new(0, 5, 0, 0);
+                    Size     = UDim2.new(1, -5, 1, 0);
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                    Font = library.options.font;
+                    TextSize = library.options.fontsize;
+                    TextStrokeTransparency = library.options.textstroke;
+                    TextStrokeColor3 = library.options.strokecolor;
+                    BorderColor3     = library.options.bordercolor;
+                    BorderSizePixel  = 1;
+                    library:Create('TextButton', {
+                        Name = 'Keybind';
+                        Text = nm;
+                        TextStrokeTransparency = library.options.textstroke;
+                        TextStrokeColor3 = library.options.strokecolor;
+                        Font = library.options.font;
+                        TextSize = library.options.fontsize;
+                        Size = UDim2.new(0, 60, 0, 20);
+                        Position = UDim2.new(1, -65, 0, 5);
+                        TextColor3 = library.options.textcolor;
+                        BackgroundColor3 = library.options.bgcolor;
+                        BorderColor3     = library.options.bordercolor;
+                        BorderSizePixel  = 1;
+                    })
+                });
+                Parent = self.container;
+            });
+             
+            local button = check:FindFirstChild(name).Keybind;
+            button.MouseButton1Click:connect(function()
+                library.binding = true
+
+                button.Text = "..."
+                local a, b = game:GetService('UserInputService').InputBegan:wait();
+                local name = tostring(a.KeyCode.Name);
+                local typeName = tostring(a.UserInputType.Name);
+
+                if (a.UserInputType ~= Enum.UserInputType.Keyboard and (allowed[a.UserInputType.Name]) and (not keyboardOnly)) or (a.KeyCode and (not banned[a.KeyCode.Name])) then
+                    local name = (a.UserInputType ~= Enum.UserInputType.Keyboard and a.UserInputType.Name or a.KeyCode.Name);
+                    location[flag] = (a);
+                    button.Text = shortNames[name] or name;
+                    
+                else
+                    if (location[flag]) then
+                        if (not pcall(function()
+                            return location[flag].UserInputType
+                        end)) then
+                            local name = tostring(location[flag])
+                            button.Text = shortNames[name] or name
+                        else
+                            local name = (location[flag].UserInputType ~= Enum.UserInputType.Keyboard and location[flag].UserInputType.Name or location[flag].KeyCode.Name);
+                            button.Text = shortNames[name] or name;
                         end
                     end
                 end
-            end
-        end
 
-    end
-    function useAbilities()
-        local function presskey(keyCode, time) 
-            vim:SendKeyEvent(true, Enum.KeyCode[keyCode], false, game)
-            wait(time)
-            vim:SendKeyEvent(false, Enum.KeyCode[keyCode], false, game)
-        end
-        for i, v in next, options.npcFarm.abilities do
-            if v == true then
-                if tostring(i) == "punch" then
-                    for i=1, 3 do
-                        ability:FireServer("Punch", {})
-                        wait()
-                    end
-                elseif tostring(i) == "barrage" then
-                    ability:FireServer("Barrage", {true, "Hand"})
-                else
-                    presskey(i, 0)
-                end
-            end
-        end
-    end
-end
-do --item Farm
-    itemFarm:Section("")
-    toggleItemFarm = itemFarm:Toggle("Enabled", {
-        location = options.itemFarm,
-        flag = "enabled"
-    }, function()
-        print("?")
-        spawn(startItemFarm)
-        if options.npcFarm.enabled then toggleNPCFarm:Set(false) end
-        if options.standFarm.enabled then toggleItemFarm:Set(false) end
-    end)
-    itemFarm:Section("")
-    local speed = itemFarm:Slider("Speed", {
-        location = options.itemFarm,
-        flag = "selectedSpeed",
-        min = 30,
-        default = 60,
-        max = 240
-    })
-    itemFarm:Section("")
-
-    function startItemFarm()
-        while options.itemFarm.enabled do wait()
-            if options.npcFarm.enabled then toggleNPCFarm:Set(false) end
-            for i, v in next, game:GetService("Workspace"):GetChildren() do
-                if options.npcFarm.enabled == true then
-                    break
-                end
-                if v:FindFirstChild("Handler") and not v:IsA("Model") and v:FindFirstChildOfClass("TouchTransmitter") then
-                    local anim = tweenService:Create(chr.HumanoidRootPart, TweenInfo.new((chr.HumanoidRootPart.Position - v.Position).Magnitude / options.itemFarm.selectedSpeed), {CFrame = v.CFrame})
-                    anim:Play()
-                    anim.Completed:wait()
-                end
-            end
-        end
-    end
-end
-do --stand Farm
-    local stands = {}
-    local attributes = {}
-    local configs = {
-        {"The World OVA", "None"},
-        {"Dio's The World", "None"},
-        {"White Snake", "None"},
-        {"Jotaro's Star Platinum", "None"},
-        {"Premier Macho", "None"},
-        {"Star Platinum OVA", "None"},
-        {"None", "Legendary"},
-    }
-    do--add stands & attributes
-        local blacklist = {
-            [1] = "King Crimson Requiem",
-            [2] = "DIO's The World Over Heaven",
-            [3] = "Jotaro's Star Platinum Over Heaven",
-            [4] = "Silver Chariot Requiem",
-            [5] = "Made In Heaven",
-            [6] = "Golden Experience Requiem",
-            [7] = "The World OVA Over Heaven",
-            [8] = "Star Platinum Over Heaven",
-            [9] = "The Hand Requiem",
-            [10] = "Star Platinum OVA Over Heaven",
-            [11] = "The World Over Heaven",
-            [12] = "C-Moon",
-        }
-        for _,v in next, require(game:GetService("Lighting").StandStats) do
-            if not table.find(blacklist, v.Name) then
-                stands[#stands+1] = v.Name
-            end
-        end
-        for _,v in next, require(game:GetService("Lighting").AttributeStats) do
-            attributes[#attributes+1] = v.Attribute
-        end
-        for _,v in next, configs do
-            local stand = standFarmConfigs:Section('Stand: '..v[1])
-            local attr = standFarmConfigs:Section('Attribute: '..v[2])
-            standFarmConfigs:Button("Remove", function(self)
-                local cache = {v[1], v[2]}
-                stand:Destroy()
-                attr:Destroy()
-                self:Destroy()
-                table.remove(configs, table.find(configs, cache))
+                wait(0.1)  
+                library.binding = false;
             end)
+            
+            if location[flag] then
+                button.Text = shortNames[tostring(location[flag].Name)] or tostring(location[flag].Name)
+            end
+
+            library.binds[flag] = {
+                location = location;
+                callback = callback;
+            };
+
+            self:Resize();
+        end
+    
+        function types:Section(name)
+            local order = self:GetOrder();
+            local determinedSize = UDim2.new(1, 0, 0, 25)
+            local determinedPos = UDim2.new(0, 0, 0, 4);
+            local secondarySize = UDim2.new(1, 0, 0, 20);
+                        
+            if order == 0 then
+                determinedSize = UDim2.new(1, 0, 0, 21)
+                determinedPos = UDim2.new(0, 0, 0, -1);
+                secondarySize = nil
+            end
+            
+            local check = library:Create('Frame', {
+                Name = 'Section';
+                BackgroundTransparency = 1;
+                Size = determinedSize;
+                BackgroundColor3 = library.options.sectncolor;
+                BorderSizePixel = 0;
+                LayoutOrder = order;
+                library:Create('TextLabel', {
+                    Name = 'section_lbl';
+                    Text = name;
+                    BackgroundTransparency = 0;
+                    BorderSizePixel = 0;
+                    BackgroundColor3 = library.options.sectncolor;
+                    TextColor3 = library.options.textcolor;
+                    Position = determinedPos;
+                    Size     = (secondarySize or UDim2.new(1, 0, 1, 0));
+                    Font = library.options.font;
+                    TextSize = library.options.fontsize;
+                    TextStrokeTransparency = library.options.textstroke;
+                    TextStrokeColor3 = library.options.strokecolor;
+                });
+                Parent = self.container;
+            });
+        
+            self:Resize();
+            return {
+                Destroy = function()
+                    check:Destroy()
+                end
+            }
+        end
+
+        function types:Slider(name, options, callback)
+            local default = options.default or options.min;
+            local min     = options.min or 0;
+            local max      = options.max or 1;
+            local location = options.location or self.flags;
+            local precise  = options.precise  or false -- e.g 0, 1 vs 0, 0.1, 0.2, ...
+            local flag     = options.flag or "";
+            local callback = callback or function() end
+
+            location[flag] = default;
+
+            local check = library:Create('Frame', {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(1, 0, 0, 25);
+                LayoutOrder = self:GetOrder();
+                library:Create('TextLabel', {
+                    Name = name;
+                    TextStrokeTransparency = library.options.textstroke;
+                    TextStrokeColor3 = library.options.strokecolor;
+                    Text = "\r" .. name;
+                    BackgroundTransparency = 1;
+                    TextColor3 = library.options.textcolor;
+                    Position = UDim2.new(0, 5, 0, 2);
+                    Size     = UDim2.new(1, -5, 1, 0);
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                    Font = library.options.font;
+                    TextSize = library.options.fontsize;
+                    library:Create('Frame', {
+                        Name = 'Container';
+                        Size = UDim2.new(0, 60, 0, 20);
+                        Position = UDim2.new(1, -65, 0, 3);
+                        BackgroundTransparency = 1;
+                        --BorderColor3 = library.options.bordercolor;
+                        BorderSizePixel = 0;
+                        library:Create('TextLabel', {
+                            Name = 'ValueLabel';
+                            Text = default;
+                            BackgroundTransparency = 1;
+                            TextColor3 = library.options.textcolor;
+                            Position = UDim2.new(0, -10, 0, 0);
+                            Size     = UDim2.new(0, 1, 1, 0);
+                            TextXAlignment = Enum.TextXAlignment.Right;
+                            Font = library.options.font;
+                            TextSize = library.options.fontsize;
+                            TextStrokeTransparency = library.options.textstroke;
+                            TextStrokeColor3 = library.options.strokecolor;
+                        });
+                        library:Create('TextButton', {
+                            Name = 'Button';
+                            Size = UDim2.new(0, 5, 1, -2);
+                            Position = UDim2.new(0, 0, 0, 1);
+                            AutoButtonColor = false;
+                            Text = "";
+                            BackgroundColor3 = Color3.fromRGB(20, 20, 20);
+                            BorderSizePixel = 0;
+                            ZIndex = 2;
+                            TextStrokeTransparency = library.options.textstroke;
+                            TextStrokeColor3 = library.options.strokecolor;
+                        });
+                        library:Create('Frame', {
+                            Name = 'Line';
+                            BackgroundTransparency = 0;
+                            Position = UDim2.new(0, 0, 0.5, 0);
+                            Size     = UDim2.new(1, 0, 0, 1);
+                            BackgroundColor3 = library.options.textcolor;
+                            BorderSizePixel = 0;
+                        });
+                    })
+                });
+                Parent = self.container;
+            });
+
+            local overlay = check:FindFirstChild(name);
+
+            local renderSteppedConnection;
+            local inputBeganConnection;
+            local inputEndedConnection;
+            local mouseLeaveConnection;
+            local mouseDownConnection;
+            local mouseUpConnection;
+
+            check:FindFirstChild(name).Container.MouseEnter:connect(function()
+                local function update()
+                    if renderSteppedConnection then renderSteppedConnection:disconnect() end 
+                    
+
+                    renderSteppedConnection = game:GetService('RunService').RenderStepped:connect(function()
+                        local mouse = game:GetService("UserInputService"):GetMouseLocation()
+                        local percent = (mouse.X - overlay.Container.AbsolutePosition.X) / (overlay.Container.AbsoluteSize.X)
+                        percent = math.clamp(percent, 0, 1)
+                        percent = tonumber(string.format("%.2f", percent))
+
+                        overlay.Container.Button.Position = UDim2.new(math.clamp(percent, 0, 0.99), 0, 0, 1)
+                        
+                        local num = min + (max - min) * percent
+                        local value = (precise and num or math.floor(num))
+
+                        overlay.Container.ValueLabel.Text = value;
+                        callback(tonumber(value))
+                        location[flag] = tonumber(value)
+                    end)
+                end
+
+                local function disconnect()
+                    if renderSteppedConnection then renderSteppedConnection:disconnect() end
+                    if inputBeganConnection then inputBeganConnection:disconnect() end
+                    if inputEndedConnection then inputEndedConnection:disconnect() end
+                    if mouseLeaveConnection then mouseLeaveConnection:disconnect() end
+                    if mouseUpConnection then mouseUpConnection:disconnect() end
+                end
+
+                inputBeganConnection = check:FindFirstChild(name).Container.InputBegan:connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        update()
+                    end
+                end)
+
+                inputEndedConnection = check:FindFirstChild(name).Container.InputEnded:connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        disconnect()
+                    end
+                end)
+
+                mouseDownConnection = check:FindFirstChild(name).Container.Button.MouseButton1Down:connect(update)
+                mouseUpConnection   = game:GetService("UserInputService").InputEnded:connect(function(a, b)
+                    if a.UserInputType == Enum.UserInputType.MouseButton1 and (mouseDownConnection.Connected) then
+                        disconnect()
+                    end
+                end)
+            end)    
+
+            if default ~= min then
+                local percent = 1 - ((max - default) / (max - min))
+                local number  = default 
+
+                number = tonumber(string.format("%.2f", number))
+                if (not precise) then
+                    number = math.floor(number)
+                end
+
+                overlay.Container.Button.Position  = UDim2.new(math.clamp(percent, 0, 0.99), 0,  0, 1) 
+                overlay.Container.ValueLabel.Text  = number
+            end
+
+            self:Resize();
+            return {
+                Set = function(self, value)
+                    local percent = 1 - ((max - value) / (max - min))
+                    local number  = value 
+
+                    number = tonumber(string.format("%.2f", number))
+                    if (not precise) then
+                        number = math.floor(number)
+                    end
+
+                    overlay.Container.Button.Position  = UDim2.new(math.clamp(percent, 0, 0.99), 0,  0, 1) 
+                    overlay.Container.ValueLabel.Text  = number
+                    location[flag] = number
+                    callback(number)
+                end
+            }
+        end 
+
+        function types:SearchBox(text, options, callback)
+            local list = options.list or {};
+            local flag = options.flag or "";
+            local location = options.location or self.flags;
+            local callback = callback or function() end;
+
+            local busy = false;
+            local box = library:Create('Frame', {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(1, 0, 0, 25);
+                LayoutOrder = self:GetOrder();
+                library:Create('TextBox', {
+                    Text = list[1];
+                    PlaceholderText = text;
+                    PlaceholderColor3 = Color3.fromRGB(60, 60, 60);
+                    Font = library.options.font;
+                    TextSize = library.options.fontsize;
+                    Name = 'Box';
+                    Size = UDim2.new(1, -10, 0, 20);
+                    Position = UDim2.new(0, 5, 0, 4);
+                    TextColor3 = library.options.textcolor;
+                    BackgroundColor3 = library.options.dropcolor;
+                    BorderColor3 = library.options.bordercolor;
+                    TextStrokeTransparency = library.options.textstroke;
+                    TextStrokeColor3 = library.options.strokecolor;
+                    library:Create('ScrollingFrame', {
+                        Position = UDim2.new(0, 0, 1, 1);
+                        Name = 'Container';
+                        BackgroundColor3 = library.options.btncolor;
+                        ScrollBarThickness = 0;
+                        BorderSizePixel = 0;
+                        BorderColor3 = library.options.bordercolor;
+                        Size = UDim2.new(1, 0, 0, 0);
+                        library:Create('UIListLayout', {
+                            Name = 'ListLayout';
+                            SortOrder = Enum.SortOrder.LayoutOrder;
+                        });
+                        ZIndex = 2;
+                    });
+                });
+                Parent = self.container;
+            })
+
+            local function rebuild(text)
+                box:FindFirstChild('Box').Container.ScrollBarThickness = 0
+                for i, child in next, box:FindFirstChild('Box').Container:GetChildren() do
+                    if (not child:IsA('UIListLayout')) then
+                        child:Destroy();
+                    end
+                end
+
+                if #text > 0 then
+                    for i, v in next, list do
+                        if string.sub(string.lower(v), 1, string.len(text)) == string.lower(text) then
+                            local button = library:Create('TextButton', {
+                                Text = tostring(v);
+                                Font = library.options.font;
+                                TextSize = library.options.fontsize;
+                                TextColor3 = library.options.textcolor;
+                                BorderColor3 = library.options.bordercolor;
+                                TextStrokeTransparency = library.options.textstroke;
+                                TextStrokeColor3 = library.options.strokecolor;
+                                Parent = box:FindFirstChild('Box').Container;
+                                Size = UDim2.new(1, 0, 0, 20);
+                                LayoutOrder = i;
+                                BackgroundColor3 = library.options.btncolor;
+                                ZIndex = 2;
+                            })
+
+                            button.MouseButton1Click:connect(function()
+                                busy = true;
+                                box:FindFirstChild('Box').Text = button.Text;
+                                wait();
+                                busy = false;
+
+                                location[flag] = v;
+                                callback(location[flag])
+
+                                box:FindFirstChild('Box').Container.ScrollBarThickness = 0
+                                for i, child in next, box:FindFirstChild('Box').Container:GetChildren() do
+                                    if (not child:IsA('UIListLayout')) then
+                                        child:Destroy();
+                                    end
+                                end
+                                box:FindFirstChild('Box').Container:TweenSize(UDim2.new(1, 0, 0, 0), 'Out', 'Quint', .3, true)
+                            end)
+                        end
+                    end
+                end
+
+                local c = box:FindFirstChild('Box').Container:GetChildren()
+                local ry = (20 * (#c)) - 20
+
+                local y = math.clamp((20 * (#c)) - 20, 0, 100)
+                if ry > 100 then
+                    box:FindFirstChild('Box').Container.ScrollBarThickness = 5;
+                end
+
+                box:FindFirstChild('Box').Container:TweenSize(UDim2.new(1, 0, 0, y), 'Out', 'Quint', .3, true)
+                box:FindFirstChild('Box').Container.CanvasSize = UDim2.new(1, 0, 0, (20 * (#c)) - 20)
+            end
+
+            box:FindFirstChild('Box'):GetPropertyChangedSignal('Text'):connect(function()
+                if (not busy) then
+                    rebuild(box:FindFirstChild('Box').Text)
+                end
+            end);
+
+
+            local function reload(self, array)
+                options = array;
+                location[flag] = array[1];
+
+                box:FindFirstChild('Box').Text = location[flag]
+                box:FindFirstChild('Box').TextColor3 = library.options.textcolor
+                game:GetService('Debris'):AddItem(container, 0)
+            end
+            self:Resize();
+            
+            return {
+                Refresh = reload,
+                Set = function(self, b)
+                    location[flag] = b;
+                    box:FindFirstChild('Box').Text = location[flag] and utf8.char(10003) or "";
+                end
+            }
+        end
+        
+        function types:Dropdown(name, options, callback)
+            local location = options.location or self.flags;
+            local flag = options.flag or "";
+            local callback = callback or function() end;
+            local list = options.list or {};
+
+            location[flag] = list[1]
+            local check = library:Create('Frame', {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(1, 0, 0, 25);
+                BackgroundColor3 = Color3.fromRGB(25, 25, 25);
+                BorderSizePixel = 0;
+                LayoutOrder = self:GetOrder();
+                library:Create('Frame', {
+                    Name = 'dropdown_lbl';
+                    BackgroundTransparency = 0;
+                    BackgroundColor3 = library.options.dropcolor;
+                    Position = UDim2.new(0, 5, 0, 4);
+                    BorderColor3 = library.options.bordercolor;
+                    Size     = UDim2.new(1, -10, 0, 20);
+                    library:Create('TextLabel', {
+                        Name = 'Selection';
+                        Size = UDim2.new(1, 0, 1, 0);
+                        Text = list[1];
+                        TextColor3 = library.options.textcolor;
+                        BackgroundTransparency = 1;
+                        Font = library.options.font;
+                        TextSize = library.options.fontsize;
+                        TextStrokeTransparency = library.options.textstroke;
+                        TextStrokeColor3 = library.options.strokecolor;
+                    });
+                    library:Create("TextButton", {
+                        Name = 'drop';
+                        BackgroundTransparency = 1;
+                        Size = UDim2.new(0, 20, 1, 0);
+                        Position = UDim2.new(1, -25, 0, 0);
+                        Text = 'v';
+                        TextColor3 = library.options.textcolor;
+                        Font = library.options.font;
+                        TextSize = library.options.fontsize;
+                        TextStrokeTransparency = library.options.textstroke;
+                        TextStrokeColor3 = library.options.strokecolor;
+                    })
+                });
+                Parent = self.container;
+            });
+            
+            local button = check:FindFirstChild('dropdown_lbl').drop;
+            local input;
+            
+            button.MouseButton1Click:connect(function()
+                if (input and input.Connected) then
+                    return
+                end 
+                
+                check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').TextColor3 = Color3.fromRGB(60, 60, 60);
+                check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').Text = name;
+                local c = 0;
+                for i, v in next, list do
+                    c = c + 20;
+                end
+
+                local size = UDim2.new(1, 0, 0, c)
+
+                local clampedSize;
+                local scrollSize = 0;
+                if size.Y.Offset > 100 then
+                    clampedSize = UDim2.new(1, 0, 0, 100)
+                    scrollSize = 5;
+                end
+                
+                local goSize = (clampedSize ~= nil and clampedSize) or size;    
+                local container = library:Create('ScrollingFrame', {
+                    TopImage = 'rbxasset://textures/ui/Scroll/scroll-middle.png';
+                    BottomImage = 'rbxasset://textures/ui/Scroll/scroll-middle.png';
+                    Name = 'DropContainer';
+                    Parent = check:FindFirstChild('dropdown_lbl');
+                    Size = UDim2.new(1, 0, 0, 0);
+                    BackgroundColor3 = library.options.bgcolor;
+                    BorderColor3 = library.options.bordercolor;
+                    Position = UDim2.new(0, 0, 1, 0);
+                    ScrollBarThickness = scrollSize;
+                    CanvasSize = UDim2.new(0, 0, 0, size.Y.Offset);
+                    ZIndex = 5;
+                    ClipsDescendants = true;
+                    library:Create('UIListLayout', {
+                        Name = 'List';
+                        SortOrder = Enum.SortOrder.LayoutOrder
+                    })
+                })
+
+                for i, v in next, list do
+                    local btn = library:Create('TextButton', {
+                        Size = UDim2.new(1, 0, 0, 20);
+                        BackgroundColor3 = library.options.btncolor;
+                        BorderColor3 = library.options.bordercolor;
+                        Text = tostring(v);
+                        Font = library.options.font;
+                        TextSize = library.options.fontsize;
+                        LayoutOrder = i;
+                        Parent = container;
+                        ZIndex = 5;
+                        TextColor3 = library.options.textcolor;
+                        TextStrokeTransparency = library.options.textstroke;
+                        TextStrokeColor3 = library.options.strokecolor;
+                    })
+                    
+                    btn.MouseButton1Click:connect(function()
+                        check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').TextColor3 = library.options.textcolor
+                        check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').Text = btn.Text;
+
+                        location[flag] = v;
+                        callback(location[flag])
+
+                        game:GetService('Debris'):AddItem(container, 0)
+                        input:disconnect();
+                    end)
+                end
+                
+                container:TweenSize(goSize, 'Out', 'Quint', .3, true)
+                
+                local function isInGui(frame)
+                    local mloc = game:GetService('UserInputService'):GetMouseLocation();
+                    local mouse = Vector2.new(mloc.X, mloc.Y - 36);
+                    
+                    local x1, x2 = frame.AbsolutePosition.X, frame.AbsolutePosition.X + frame.AbsoluteSize.X;
+                    local y1, y2 = frame.AbsolutePosition.Y, frame.AbsolutePosition.Y + frame.AbsoluteSize.Y;
+                
+                    return (mouse.X >= x1 and mouse.X <= x2) and (mouse.Y >= y1 and mouse.Y <= y2)
+                end
+                
+                input = game:GetService('UserInputService').InputBegan:connect(function(a)
+                    if a.UserInputType == Enum.UserInputType.MouseButton1 and (not isInGui(container)) then
+                        check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').TextColor3 = library.options.textcolor
+                        check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').Text       = tostring(location[flag]);
+
+                        container:TweenSize(UDim2.new(1, 0, 0, 0), 'In', 'Quint', .3, true)
+                        wait(0.15)
+
+                        game:GetService('Debris'):AddItem(container, 0)
+                        input:disconnect();
+                    end
+                end)
+            end)
+            
+            self:Resize();
+            local function reload(self, array)
+                options = array;
+                location[flag] = array[1];
+                pcall(function()
+                    input:disconnect()
+                end)
+                check:WaitForChild('dropdown_lbl').Selection.Text = location[flag]
+                check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').TextColor3 = library.options.textcolor
+                game:GetService('Debris'):AddItem(container, 0)
+            end
+
+            return {
+                Refresh = reload;
+            }
         end
     end
-    standFarm:Section("")
-    toggleStandFarm = standFarm:Toggle("Enabled", {
-        location = options.standFarm,
-        flag = "enabled",
-    }, function()
-        spawn(startStandFarm)
-    end)
-    standFarm:Section("")
-    standFarm:Dropdown("Prioritize", {
-        location = options.standFarm,
-        options = "prioritize",
-        list = {"Attribute", "Stand", "Any", "Both"}
-    }):Refresh({"Any", "Stand", "Attribute", "Both"})
-    standFarm:Section("")
-    standFarm:SearchBox("Select Stand", {
-        location = options.standFarm,
-        flag = "selectedStand",
-        list = stands,
-    }):Set("None")
-    standFarm:SearchBox("Selected Attribute", {
-        location = options.standFarm,
-        flag = "selectedAttr",
-        list = attributes
-    }):Set("None")
-    standFarm:Button("Add Config", function()
-        local stand = standFarmConfigs:Section("Stand: "..tostring(options.standFarm.selectedStand)) 
-        local attr = standFarmConfigs:Section("Attribute: "..tostring(options.standFarm.selectedAttr)) 
-        standFarmConfigs:Button("Remove", function(self)
-            local cache = {tostring(options.standFarm.selectedStand), tostring(options.standFarm.selectedAttr)}
-            stand:Destroy()
-            attr:Destroy()
-            self:Destroy()
-            table.remove(configs, table.find(configs, cache))
-        end)
-        table.insert(configs, {tostring(options.standFarm.selectedStand), tostring(options.standFarm.selectedAttr)})
-    end)
-    standFarm:Section("")
-    function startStandFarm()
-        local curr = player.Data.Stand.Value.."/"..player.Data.Attribute.Value
-        local data = curr:split("/")
-        function useItem()
-            local useItem = game:GetService("ReplicatedStorage").Useitem
-            if player.PlayerGui:FindFirstChild("ItemPrompt") ~= nil then
-                player.PlayerGui:FindFirstChild("ItemPrompt"):Destroy()
-            end
-            if data[1] == "None" then
-                local arr = player.Backpack:FindFirstChild("Unusual Arrow") or player.Backpack:FindFirstChild("Stand Arrow") 
-                chr:WaitForChild("Humanoid", 9e9):EquipTool(arr)
-                do
-                    repeat wait() 
-                        useItem:FireServer(arr) 
-                    until player.PlayerGui:FindFirstChild("ItemPrompt") ~= nil and player.PlayerGui.ItemPrompt.Frame:FindFirstChild("Yes") ~= nil
-                    local itemPrompt = player.PlayerGui:FindFirstChild("ItemPrompt").Frame
-                    repeat wait(0.5)
-                        vim:SendMouseButtonEvent(itemPrompt.Yes.AbsolutePosition.X + (itemPrompt.Yes.AbsoluteSize.X / 2), itemPrompt.Yes.AbsolutePosition.Y + (itemPrompt.Yes.AbsoluteSize.Y) , 0, true, game, 0)
-                        wait()
-                        vim:SendMouseButtonEvent(itemPrompt.Yes.AbsolutePosition.X + (itemPrompt.Yes.AbsoluteSize.X / 2), itemPrompt.Yes.AbsolutePosition.Y + (itemPrompt.Yes.AbsoluteSize.Y), 0, false, game, 0)
-                    until player.PlayerGui:FindFirstChild("ItemPrompt") == nil 
-                end
-            else
-                local roka = player.Backpack:FindFirstChild("Rokakaka")
-                chr:WaitForChild("Humanoid", 9e9):EquipTool(roka)
-                do
-                    repeat wait() 
-                        useItem:FireServer(roka) 
-                    until player.PlayerGui:FindFirstChild("ItemPrompt") ~= nil and player.PlayerGui.ItemPrompt.Frame:FindFirstChild("Yes") ~= nil
-                    local itemPrompt = player.PlayerGui:FindFirstChild("ItemPrompt").Frame
-                    repeat wait(0.5)
-                        vim:SendMouseButtonEvent(itemPrompt.Yes.AbsolutePosition.X + (itemPrompt.Yes.AbsoluteSize.X / 2), itemPrompt.Yes.AbsolutePosition.Y + (itemPrompt.Yes.AbsoluteSize.Y) , 0, true, game, 0)
-                        wait()
-                        vim:SendMouseButtonEvent(itemPrompt.Yes.AbsolutePosition.X + (itemPrompt.Yes.AbsoluteSize.X / 2), itemPrompt.Yes.AbsolutePosition.Y + (itemPrompt.Yes.AbsoluteSize.Y), 0, false, game, 0)
-                    until player.PlayerGui:FindFirstChild("ItemPrompt") == nil
+    
+    function library:Create(class, data)
+        local obj = Instance.new(class);
+        for i, v in next, data do
+            if i ~= 'Parent' then
+                
+                if typeof(v) == "Instance" then
+                    v.Parent = obj;
+                else
+                    obj[i] = v
                 end
             end
         end
-        while options.standFarm.enabled do
-            if options.standFarm.prioritize == "Attribute" then
-                for _,v in next, configs do
-                    if table.find(v, data[2]) then
-                        toggleStandFarm:Set(false)
-                        break
-                    end
+        
+        obj.Parent = data.Parent;
+        return obj
+    end
+    
+	default = {
+        topcolor       = Color3.fromRGB(30, 30, 30);
+        titlecolor     = Color3.fromRGB(255, 255, 255);
+        
+        underlinecolor = Color3.fromRGB(0, 255, 140);
+        bgcolor        = Color3.fromRGB(35, 35, 35);
+        boxcolor       = Color3.fromRGB(35, 35, 35);
+        btncolor       = Color3.fromRGB(25, 25, 25);
+        dropcolor      = Color3.fromRGB(25, 25, 25);
+        sectncolor     = Color3.fromRGB(25, 25, 25);
+        bordercolor    = Color3.fromRGB(60, 60, 60);
+
+        font           = Enum.Font.SourceSans;
+        titlefont      = Enum.Font.Code;
+
+        fontsize       = 17;
+        titlesize      = 18;
+
+        textstroke     = 1;
+        titlestroke    = 1;
+
+        strokecolor    = Color3.fromRGB(0, 0, 0);
+
+        textcolor      = Color3.fromRGB(255, 255, 255);
+        titletextcolor = Color3.fromRGB(255, 255, 255);
+
+        placeholdercolor = Color3.fromRGB(255, 255, 255);
+        titlestrokecolor = Color3.fromRGB(0, 0, 0);
+    }
+	
+    function library:CreateWindow(name, options)
+		
+        if (not library.container) then
+            library.container = self:Create("ScreenGui", {
+                self:Create('Frame', {
+                    Name = 'Container';
+                    Size = UDim2.new(1, -30, 1, 0);
+                    Position = UDim2.new(0, 20, 0, 20);
+                    BackgroundTransparency = 1;
+                    Active = false;
+                });
+                Parent = game:GetService("CoreGui");
+            }):FindFirstChild('Container');
+        end
+        if (not library.options) then
+			library.options = setmetatable(options or {}, {__index = defaults})
+        end
+		if (options) then
+			library.options = setmetatable(options, {__index = default})
+		end
+		
+        local window = types.window(name, library.options);
+        dragger.new(window.object);
+        return window
+    end
+
+    library.options = setmetatable({}, {__index = default})
+
+    spawn(function()
+        while true do
+            for i=0, 1, 1 / 300 do              
+                for _, obj in next, library.rainbowtable do
+                    obj.BackgroundColor3 = Color3.fromHSV(i, 1, 1);
                 end
-            elseif options.standFarm.prioritize == "Stand" then
-                for _,v in next, configs do
-                    if table.find(v, data[1]) then
-                        toggleStandFarm:Set(false)
-                        break
-                    end
-                end
-            elseif options.standFarm.prioritize == "Any" then
-                for _,v in next, configs do
-                    if table.find(v, data[1]) or table.find(v, data[2]) then
-                        toggleStandFarm:Set(false)
-                        break
-                    end
-                end
-            elseif options.standFarm.prioritize == "Both" then
-                for _,v in next, configs do
-                    if table.find(v, data[1]) and table.find(v, data[2]) then
-                        toggleStandFarm:Set(false)
-                        break
-                    end
-                end
+                wait()
+            end;
+        end
+    end)
+
+    local function isreallypressed(bind, inp)
+        local key = bind
+        if typeof(key) == "Instance" then
+            if key.UserInputType == Enum.UserInputType.Keyboard and inp.KeyCode == key.KeyCode then
+                return true;
+            elseif tostring(key.UserInputType):find('MouseButton') and inp.UserInputType == key.UserInputType then
+                return true
             end
-            useItem()
-            curr = player.Data.Stand.Value.."/"..player.Data.Attribute.Value
-            data = curr:split("/")
+        end
+        if tostring(key):find'MouseButton1' then
+            return key == inp.UserInputType
+        else
+            return key == inp.KeyCode
         end
     end
+
+    game:GetService("UserInputService").InputBegan:connect(function(input)
+        if (not library.binding) then
+            for idx, binds in next, library.binds do
+                local real_binding = binds.location[idx];
+                if real_binding and isreallypressed(real_binding, input) then
+                    binds.callback()
+                end
+            end
+        end
+    end)
 end
+
+return library
