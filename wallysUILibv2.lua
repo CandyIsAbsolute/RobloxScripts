@@ -270,9 +270,9 @@ local defaults; do
                 Fire = function()
                     callback();
                 end,
-                Destroy = function()
-                    check:Destroy()
-                end
+                Fired = function(func)
+                    return check:FindFirstChild(name).MouseButton1Click:connect(func(check))
+                end,
             }
         end
         
