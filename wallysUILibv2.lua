@@ -688,7 +688,7 @@ local defaults; do
                 Size = UDim2.new(1, 0, 0, 25);
                 LayoutOrder = self:GetOrder();
                 library:Create('TextBox', {
-                    Text = "";
+                    Text = list[1];
                     PlaceholderText = text;
                     PlaceholderColor3 = Color3.fromRGB(60, 60, 60);
                     Font = library.options.font;
@@ -784,12 +784,24 @@ local defaults; do
                 end
             end);
 
-            local function reload(new_list)
-                list = new_list;
-                rebuild("")
+
+            local function reload(self, array)
+                options = array;
+                location[flag] = array[1];
+
+                box:FindFirstChild('Box').Container.Text = location[flag]
+                box:FindFirstChild('Box').Container.TextColor3 = library.options.textcolor
+                game:GetService('Debris'):AddItem(container, 0)
             end
             self:Resize();
-            return reload, box:FindFirstChild('Box');
+            
+            return {
+                Refresh = reload,
+                Set = function(self, b)
+                    location[flag] = b;
+                    box:FindFirstChild('Box').Container.Text = location[flag] and utf8.char(10003) or "";
+                end
+            }
         end
         
         function types:Dropdown(name, options, callback)
