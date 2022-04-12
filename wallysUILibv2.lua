@@ -508,7 +508,8 @@ local defaults; do
             return {
                 Destroy = function()
                     check:Destroy()
-                end
+                end,
+                Self = check
             }
         end
 
