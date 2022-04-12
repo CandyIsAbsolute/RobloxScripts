@@ -784,22 +784,16 @@ local defaults; do
             end);
 
 
-            local function reload(self, array)
+            --[[local function reload(self, array)
                 options = array;
                 location[flag] = array[1];
 
                 box:FindFirstChild('Box').Text = location[flag]
                 box:FindFirstChild('Box').TextColor3 = library.options.textcolor
-            end
+            end]]
             self:Resize();
             
-            return {
-                Refresh = reload,
-                Set = function(self, b)
-                    location[flag] = b;
-                    box:FindFirstChild('Box').Text = location[flag]
-                end
-            }
+            return {}
         end
         
         function types:Dropdown(name, options, callback)
