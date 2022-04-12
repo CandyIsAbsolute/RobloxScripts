@@ -825,7 +825,7 @@ local defaults; do
                     library:Create('TextLabel', {
                         Name = 'Selection';
                         Size = UDim2.new(1, 0, 1, 0);
-                        Text = list[1];
+                        Text = tostring(list[1]);
                         TextColor3 = library.options.textcolor;
                         BackgroundTransparency = 1;
                         Font = library.options.font;
