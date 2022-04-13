@@ -1,4 +1,4 @@
---made by ydnac :3
+--test
 local tweenService = game:GetService("TweenService")
 local vim = game:GetService("VirtualInputManager")
 local ability = game:GetService("ReplicatedStorage"):FindFirstChild("Ability")
@@ -105,6 +105,7 @@ do --npc Farm
 			chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 			chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 		else
+			wait(3)
 			chr:FindFirstChild('HumanoidRootPart').CFrame = oldpos
 			chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
 			chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
