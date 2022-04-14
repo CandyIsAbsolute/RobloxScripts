@@ -201,6 +201,7 @@ do --item Farm
 		precise = true,
 		min = 0,
 		max = 0.5,
+		default = 0.05
 	})
 	itemFarm:Section("")
 end
@@ -225,6 +226,10 @@ do --stand Farm
 			"Legendary"
 		},
 		{
+			"The World",
+			"Legendary"
+		},
+		{
 			"DIO's The World",
 			"Daemon",
 		},
@@ -238,6 +243,10 @@ do --stand Farm
 		},
 		{
 			"The World OVA",
+			"Daemon"
+		},
+		{
+			"The World",
 			"Daemon"
 		},
 	}
@@ -283,7 +292,7 @@ do --stand Farm
 			"Both"
 		}
 	}):Refresh({
-		"Any"
+		"Both"
 	})
 	standFarm:Section("Select Stand").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	standFarm:SearchBox("Select Stand", {
