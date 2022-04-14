@@ -241,7 +241,7 @@ local defaults; do
         
         function types:Button(name, callback)
             callback = callback or function() end;
-            local textSize = game:GetService('TextService'):GetTextSize("\r" .. name, library.options.fontsize, library.options.font, Vector2.new(20, 20))
+            local textSize = game:GetService('TextService'):GetTextSize("\r" .. name, library.options.fontsize, library.options.font, Vector2.new(20, 20)) / 1.5
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
