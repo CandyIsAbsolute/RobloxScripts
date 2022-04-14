@@ -1,4 +1,3 @@
---test
 local tweenService = game:GetService("TweenService")
 local vim = game:GetService("VirtualInputManager")
 local ability = game:GetService("ReplicatedStorage"):FindFirstChild("Ability")
@@ -17,7 +16,7 @@ function noClip()
 		while clipping do
 			game:GetService("RunService").Stepped:Wait()
 			for _, v in next, chr:GetDescendants() do
-				if v:IsA('BasePart') then
+				if v:IsA("BasePart") then
 					v.CanCollide = false
 				end
 			end
@@ -31,7 +30,7 @@ local function ScaleToOffset(x, y)
 	return x, y
 end
 
-local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/CandyIsAbsolute/RobloxScripts/main/wallysUILibv2.lua', true))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/CandyIsAbsolute/RobloxScripts/main/wallysUILibv2.lua", true))()
 
 local npcFarm = library:CreateWindow("NPC Farm")
 local itemFarm = library:CreateWindow("Item Farm")
@@ -101,12 +100,12 @@ do --npc Farm
 	}, function()
 		if options.npcFarm.enabledDungeonFarm then
 			task.spawn(startDungeonFarm)
-			oldpos = chr:FindFirstChild('HumanoidRootPart').CFrame
+			oldpos = chr:FindFirstChild("HumanoidRootPart").CFrame
 			chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 			chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 		else
 			wait(3)
-			chr:FindFirstChild('HumanoidRootPart').CFrame = oldpos
+			chr:FindFirstChild("HumanoidRootPart").CFrame = oldpos
 			chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
 			chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
 		end
@@ -114,7 +113,7 @@ do --npc Farm
 			toggleNPCFarm:Set(false)
 		end
 	end)
-	npcFarm:Section("Settings").Self:FindFirstChild('section_lbl').TextColor3 = Color3.new(1, 0.435294, 0)
+	npcFarm:Section("Options").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	local distance = npcFarm:Slider("Distance", {
 		location = options.npcFarm,
 		flag = "selectedDistance",
@@ -122,7 +121,7 @@ do --npc Farm
 		default = 8,
 		max = 20,
 	})
-	npcFarm:Section("Select NPC/Dungeon").Self:FindFirstChild('section_lbl').TextColor3 = Color3.new(1, 0.435294, 0)
+	npcFarm:Section("Select NPC/Dungeon").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	npcFarm:Dropdown("Enemy", {
 		location = options.npcFarm,
 		flag = "selectedEnemy",
@@ -135,7 +134,7 @@ do --npc Farm
 			unpack(game:GetService("ReplicatedFirst").preloader.Assets:GetChildren())
 		}
 	})
-	npcFarm:Section("Abilities").Self:FindFirstChild('section_lbl').TextColor3 = Color3.new(1, 0.435294, 0)
+	npcFarm:Section("Abilities").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	npcFarm:Toggle("MB1", {
 		location = options.npcFarm.abilities,
 		flag = "punch"
@@ -187,7 +186,7 @@ do --item Farm
 		spawn(function()
 			while options.itemFarm.enabled do
 				wait()
-				if game:GetService('Workspace'):FindFirstChild('Unusual Arrow') ~= nil or game:GetService('Workspace'):FindFirstChild('Stand Arrow') ~= nil or game:GetService('Workspace'):FindFirstChild('Rokakaka') ~= nil then
+				if game:GetService("Workspace"):FindFirstChild("Unusual Arrow") ~= nil or game:GetService("Workspace"):FindFirstChild("Stand Arrow") ~= nil or game:GetService("Workspace"):FindFirstChild("Rokakaka") ~= nil then
 					getItems()
 				end
 			end
@@ -251,7 +250,7 @@ do --stand Farm
 	}, function()
 		spawn(startStandFarm)
 	end)
-	standFarm:Section("Prioritize").Self:FindFirstChild('section_lbl').TextColor3 = Color3.new(1, 0.435294, 0)
+	standFarm:Section("Prioritize").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	standFarm:Dropdown("Prioritize", {
 		location = options.standFarm,
 		flag = "prioritize",
@@ -264,7 +263,7 @@ do --stand Farm
 	}):Refresh({
 		"Any"
 	})
-	standFarm:Section("Select Stand").Self:FindFirstChild('section_lbl').TextColor3 = Color3.new(1, 0.435294, 0)
+	standFarm:Section("Select Stand").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	standFarm:SearchBox("Select Stand", {
 		location = options.standFarm,
 		flag = "selectedStand",
@@ -293,10 +292,10 @@ do --stand Farm
 			tostring(options.standFarm.selectedAttr)
 		})
 	end)
-	standFarm:Section("Whitelisted").Self:FindFirstChild('section_lbl').TextColor3 = Color3.new(1, 0.435294, 0)
+	standFarm:Section("Whitelisted").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	for _, v in next, configs do
-		local stand = standFarm:Section('Stand: ' .. v[1])
-		local attr = standFarm:Section('Attribute: ' .. v[2])
+		local stand = standFarm:Section("Stand: " .. v[1])
+		local attr = standFarm:Section("Attribute: " .. v[2])
 		standFarm:Button("Remove", function(self)
 			local cache = {
 				tostring(v[1]),
@@ -364,7 +363,7 @@ do --functions
 		end
 	end
 	function startDungeonFarm()
-		connection = workspace['Dungeons'].ChildAdded:connect(function(v)
+		connection = workspace["Dungeons"].ChildAdded:connect(function(v)
 			if tostring(v):match(options.npcFarm.selectedDungeon.Name) then
 				dungeon = v
 				connection:Disconnect()
@@ -375,7 +374,7 @@ do --functions
 			wait()
 		until dungeon ~= nil and wait(2)
 		while options.npcFarm.enabledDungeonFarm do
-			game:GetService('RunService').Stepped:wait()
+			game:GetService("RunService").Stepped:wait()
 			if options.npcFarm.enabled then
 				toggleNPCFarm:Set(false)
 			end 
@@ -384,7 +383,7 @@ do --functions
 			end
 			chr = player.Character
 			if chr ~= nil then
-				for _, v in next, dungeon:WaitForChild('NPCS', 9e9):GetChildren() do
+				for _, v in next, dungeon:WaitForChild("NPCS", 9e9):GetChildren() do
 					local oldParent = v.Parent
 					repeat
 						if chr:WaitForChild("Summoned").Value == false then
@@ -396,21 +395,21 @@ do --functions
 						if not options.npcFarm.enabledDungeonFarm then
 							break
 						end
-						if 1 > chr:FindFirstChild('Humanoid').Health then
+						if 1 > chr:FindFirstChild("Humanoid").Health then
 							local chr2 = player.CharacterAdded:Wait()
 							print(chr2)
-							chr2:WaitForChild("HumanoidRootPart", 9e9):WaitForChild('bV', 9e9).MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
-							chr2:WaitForChild("HumanoidRootPart", 9e9):WaitForChild('bAV', 9e9).MaxTorque = Vector3.new(1 / 0, 1 / 0, 1 / 0)
+							chr2:WaitForChild("HumanoidRootPart", 9e9):WaitForChild("bV", 9e9).MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
+							chr2:WaitForChild("HumanoidRootPart", 9e9):WaitForChild("bAV", 9e9).MaxTorque = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 							startDungeonFarm()
 							break
 						end
-						if v == nil or v:FindFirstChild('HumanoidRootPart') == nil then
+						if v == nil or v:FindFirstChild("HumanoidRootPart") == nil then
 							return
 						end
-						game:GetService('RunService').Stepped:wait()
-						chr:WaitForChild('HumanoidRootPart', 9e9).CFrame = CFrame.new(v.HumanoidRootPart.Position.X, v.HumanoidRootPart.Position.Y + options.npcFarm.selectedDistance, v.HumanoidRootPart.Position.Z) * CFrame.Angles(-math.rad(90), 0, -math.rad(180))
+						game:GetService("RunService").Stepped:wait()
+						chr:WaitForChild("HumanoidRootPart", 9e9).CFrame = CFrame.new(v.HumanoidRootPart.Position.X, v.HumanoidRootPart.Position.Y + options.npcFarm.selectedDistance, v.HumanoidRootPart.Position.Z) * CFrame.Angles(-math.rad(90), 0, -math.rad(180))
 						useAbilities()
-					until v.Parent ~= oldParent or 1 > v:WaitForChild('Humanoid').Health 
+					until v.Parent ~= oldParent or 1 > v:WaitForChild("Humanoid").Health 
 				end
 			end
 			if not options.npcFarm.enabledDungeonFarm then
@@ -435,7 +434,7 @@ do --functions
 					if not options.itemFarm.enabled then
 						break
 					end
-					chr:WaitForChild('HumanoidRootPart', 9e99).CFrame = chr:WaitForChild('HumanoidRootPart', 9e99).CFrame:lerp(CFrame.new(v.Position), 0.05)
+					chr:WaitForChild("HumanoidRootPart", 9e99).CFrame = chr:WaitForChild("HumanoidRootPart", 9e99).CFrame:lerp(CFrame.new(v.Position), 0.05)
 					wait()
 				until v.Parent ~= workspace
 			end
@@ -519,7 +518,7 @@ do --functions
 			if options.standFarm.prioritize == "Both" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) and table.find(v, data[2]) then
-						print('gotboth')
+						print("gotboth")
 						toggleStandFarm:Set(false)
 						break
 					end
@@ -527,7 +526,7 @@ do --functions
 			elseif options.standFarm.prioritize == "Any" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) and data[1] ~= "None" or table.find(v, data[2]) then
-						print('got any', table.find(v, data[1]), table.find(v, data[2]), data[1], data[2])
+						print("got any", table.find(v, data[1]), table.find(v, data[2]), data[1], data[2])
 						toggleStandFarm:Set(false)
 						break
 					end
@@ -535,7 +534,7 @@ do --functions
 			elseif options.standFarm.prioritize == "Stand" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) ~= nil and data[1] ~= "None" then
-						print('got stand')
+						print("got stand")
 						toggleStandFarm:Set(false)
 						break
 					end
@@ -543,7 +542,7 @@ do --functions
 			elseif options.standFarm.prioritize == "Attribute" then
 				for _, v in next, configs do
 					if table.find(v, data[2]) ~= nil then
-						print('got attr')
+						print("got attr")
 						toggleStandFarm:Set(false)
 						break
 					end
