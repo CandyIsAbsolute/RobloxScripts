@@ -1,4 +1,3 @@
---mongus
 local tweenService = game:GetService("TweenService")
 local vim = game:GetService("VirtualInputManager")
 local ability = game:GetService("ReplicatedStorage"):FindFirstChild("Ability")
@@ -105,8 +104,10 @@ do --npc Farm
 			chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 			chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 		else
-			wait(3)
-			chr:FindFirstChild("HumanoidRootPart").CFrame = oldpos
+			spawn(function()
+				wait(3)
+				chr:FindFirstChild("HumanoidRootPart").CFrame = oldpos
+			end)
 			chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
 			chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
 		end
@@ -435,7 +436,7 @@ do --functions
 					if not options.itemFarm.enabled then
 						break
 					end
-					chr:WaitForChild("HumanoidRootPart", 9e99).CFrame = chr:WaitForChild("HumanoidRootPart", 9e99).CFrame:lerp(CFrame.new(v.Position), 0.05)
+					chr:WaitForChild("HumanoidRootPart", 9e99).CFrame = chr:WaitForChild("HumanoidRootPart", 9e99).CFrame:lerp(CFrame.new(v.Position), 0.1)
 					wait()
 				until v.Parent ~= workspace
 			end
@@ -478,8 +479,9 @@ do --functions
 						if not options.standFarm.enabled then
 							return
 						end
+						wait(1)
 						vim:SendMouseButtonEvent(X + (itemPrompt.Yes.AbsoluteSize.X / 2), Y + (itemPrompt.Yes.AbsoluteSize.Y / 2), 0, true, game, 0)
-						wait(.2)
+						wait()
 						vim:SendMouseButtonEvent(X + (itemPrompt.Yes.AbsoluteSize.X / 2) , Y + (itemPrompt.Yes.AbsoluteSize.Y / 2), 0, false, game, 0)
 					until player.PlayerGui:FindFirstChild("ItemPrompt") == nil
 				end
@@ -503,8 +505,9 @@ do --functions
 						if not options.standFarm.enabled then
 							break
 						end
+						wait(1)
 						vim:SendMouseButtonEvent(X + (itemPrompt.Yes.AbsoluteSize.X / 2), Y + (itemPrompt.Yes.AbsoluteSize.Y / 2), 0, true, game, 0)
-						wait(.2)
+						wait()
 						vim:SendMouseButtonEvent(X + (itemPrompt.Yes.AbsoluteSize.X / 2) , Y + (itemPrompt.Yes.AbsoluteSize.Y / 2), 0, false, game, 0)
 					until player.PlayerGui:FindFirstChild("ItemPrompt") == nil
 				end
