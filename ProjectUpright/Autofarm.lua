@@ -194,6 +194,14 @@ do --item Farm
 			end
 		end)
 	end)
+	itemFarm:Section("Options").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
+	itemFarm:Slider("Speed", {
+		location = options.itemFarm,
+		flag = "selectedSpeed",
+		precise = true,
+		min = 0,
+		max = 0.5,
+	})
 	itemFarm:Section("")
 end
 do --stand Farm
@@ -202,7 +210,7 @@ do --stand Farm
 	configs = {
 		{
 			"DIO's The World",
-			"Legendary"
+			"Legendary",
 		},
 		{
 			"Jotaro's Star Platinum",
@@ -217,8 +225,20 @@ do --stand Farm
 			"Legendary"
 		},
 		{
-			"Silver Chariot OVA",
-			"Legendary"
+			"DIO's The World",
+			"Daemon",
+		},
+		{
+			"Jotaro's Star Platinum",
+			"Daemon"
+		},
+		{
+			"Star Platinum OVA",
+			"Daemon"
+		},
+		{
+			"The World OVA",
+			"Daemon"
 		},
 	}
 	do--add stands & attributes
@@ -307,7 +327,6 @@ do --stand Farm
 			attr:Destroy()
 			self:Destroy()
 			table.remove(configs, table.find(configs, cache))
-			print(#configs)
 		end)
 	end
 end
@@ -364,6 +383,7 @@ do --functions
 			end
 		end
 	end
+
 	function startDungeonFarm()
 		connection = workspace["Dungeons"].ChildAdded:connect(function(v)
 			if tostring(v):match(options.npcFarm.selectedDungeon.Name) then
@@ -421,6 +441,7 @@ do --functions
 			break
 		end
 	end
+
 	function getItems()
 		if options.npcFarm.enabled then
 			oldStatus = options.npcFarm.enabled 
@@ -436,8 +457,8 @@ do --functions
 					if not options.itemFarm.enabled then
 						break
 					end
-					chr:WaitForChild("HumanoidRootPart", 9e99).CFrame = chr:WaitForChild("HumanoidRootPart", 9e99).CFrame:lerp(CFrame.new(v.Position), 0.1)
-					wait()
+					chr:WaitForChild("HumanoidRootPart", 9e99).CFrame = chr:WaitForChild("HumanoidRootPart", 9e99).CFrame:lerp(CFrame.new(v.Position), options.itemFarm.selectedSpeed)
+					game:GetService("RunService").Stepped:Wait()
 				until v.Parent ~= workspace
 			end
 		end
