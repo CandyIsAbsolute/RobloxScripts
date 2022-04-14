@@ -1,5 +1,6 @@
 local tweenService = game:GetService("TweenService")
 local vim = game:GetService("VirtualInputManager")
+
 local ability = game:GetService("ReplicatedStorage"):FindFirstChild("Ability")
 local createLair = game:GetService("ReplicatedStorage").CreateDungeon
 
@@ -35,6 +36,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Candy
 local npcFarm = library:CreateWindow("NPC Farm")
 local itemFarm = library:CreateWindow("Item Farm")
 local standFarm = library:CreateWindow("Stand Farm")
+--local miscUI = library:CreateWindow("Misc")
 
 local options = {
 	npcFarm = {
