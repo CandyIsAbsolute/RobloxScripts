@@ -204,7 +204,7 @@ local defaults; do
                         Font = library.options.font;
                         TextSize = library.options.fontsize;
                         Name = 'Checkmark';
-                        Size = UDim2.new(0, 20 + x, 0, 20 + y);
+                        Size = UDim2.new(0, 20, 0, 20);
                         Position = UDim2.new(1, -25, 0, 4);
                         TextColor3 = library.options.textcolor;
                         BackgroundColor3 = library.options.bgcolor;
