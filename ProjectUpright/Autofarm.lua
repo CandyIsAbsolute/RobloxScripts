@@ -341,7 +341,8 @@ do -- misc
 			storeStand:FireServer(tonumber(slot))
 		end)
 		stand:GetPropertyChangedSignal('Value'):Connect(function()
-			button.Self:FindFirstChildOfClass('TextButton').Text = stand.Value .. " | ".. v:FindFirstChild('Attribute').Value
+			attr:GetPropertyChangedSignal('Value'):Wait()
+			button.Self:FindFirstChildOfClass('TextButton').Text = stand.Value .. " | ".. attr.Value
 		end)
 	end
 	miscUI:Section("")
@@ -553,31 +554,37 @@ do --functions
 		while options.standFarm.enabled do
 			curr = tostring(player.Data.Stand.Value) .. "/" .. tostring(player.Data.Attribute.Value)
 			data = curr:split("/")
-			print(data)
+			print(data[1], data[2])
 			wait()
 
 			if options.standFarm.prioritize == "Both" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) and table.find(v, data[2]) then
-						print("gotboth")
-						toggleStandFarm:Set(false)
-						break
+						if if not data[1] == "None" then 
+							print("gotboth")
+							toggleStandFarm:Set(false)
+							break
+						end
 					end
 				end
 			elseif options.standFarm.prioritize == "Any" then
 				for _, v in next, configs do
-					if table.find(v, data[1]) and data[1] ~= "None" or table.find(v, data[2]) then
-						print("got any", table.find(v, data[1]), table.find(v, data[2]), data[1], data[2])
-						toggleStandFarm:Set(false)
-						break
+					if table.find(v, data[1]) or table.find(v, data[2]) then
+						if not data[1] == "None" then 
+							print("got any")
+							toggleStandFarm:Set(false)
+							break
+						end
 					end
 				end
 			elseif options.standFarm.prioritize == "Stand" then
 				for _, v in next, configs do
-					if table.find(v, data[1]) ~= nil and data[1] ~= "None" then
-						print("got stand")
-						toggleStandFarm:Set(false)
-						break
+					if table.find(v, data[1]) ~= nil then
+						if not data[1] == "None" then 
+							print("got stand")
+							toggleStandFarm:Set(false)
+							break
+						end
 					end
 				end
 			elseif options.standFarm.prioritize == "Attribute" then
