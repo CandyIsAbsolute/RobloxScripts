@@ -255,7 +255,7 @@ local defaults; do
                     TextStrokeColor3 = library.options.strokecolor;
                     TextColor3 = library.options.textcolor;
                     Position = UDim2.new(0, 5, 0, 5);
-                    Size     = UDim2.new(1, -10, 0, 20 + textSize.Y);
+                    Size     = UDim2.new(1, -10, 0, textSize.Y);
                     Font = library.options.font;
                     TextSize = library.options.fontsize;
                 });
