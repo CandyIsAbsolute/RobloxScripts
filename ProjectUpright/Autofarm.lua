@@ -560,7 +560,7 @@ do --functions
 			if options.standFarm.prioritize == "Both" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) and table.find(v, data[2]) then
-						if if not data[1] == "None" then 
+						if not data[1] == "None" then 
 							print("gotboth")
 							toggleStandFarm:Set(false)
 							break
