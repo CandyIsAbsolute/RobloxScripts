@@ -117,6 +117,9 @@ do --npc Farm
 		if options.npcFarm.enabled then
 			toggleNPCFarm:Set(false)
 		end
+		if options.itemFarm.enabled then
+			toggleItemFarm:Set(false)
+		end
 	end)
 	npcFarm:Section("Options").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	local distance = npcFarm:Slider("Distance", {
@@ -233,25 +236,10 @@ do --stand Farm
 			"Legendary"
 		},
 		{
-			"DIO's The World",
-			"Daemon",
+			"Star Platinum",
+			"Legendary"
 		},
-		{
-			"Jotaro's Star Platinum",
-			"Daemon"
-		},
-		{
-			"Star Platinum OVA",
-			"Daemon"
-		},
-		{
-			"The World OVA",
-			"Daemon"
-		},
-		{
-			"The World",
-			"Daemon"
-		},
+		
 	}
 	do--add stands & attributes
 		local blacklist = {
@@ -353,7 +341,7 @@ do -- misc
 			storeStand:FireServer(tonumber(slot))
 		end)
 		stand:GetPropertyChangedSignal('Value'):Connect(function()
-			button.Self:FindFirstChildOfClass('TextButton').Text = stand.Value .. " | ".. attr.Value
+			button.Self:FindFirstChildOfClass('TextButton').Text = stand.Value .. " | ".. v:FindFirstChild('Attribute').Value
 		end)
 	end
 	miscUI:Section("")
