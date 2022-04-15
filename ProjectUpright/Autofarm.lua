@@ -1,8 +1,9 @@
 local tweenService = game:GetService("TweenService")
 local vim = game:GetService("VirtualInputManager")
-
 local ability = game:GetService("ReplicatedStorage"):FindFirstChild("Ability")
 local createLair = game:GetService("ReplicatedStorage").CreateDungeon
+local buyItem = game:GetService("ReplicatedStorage").BuyItem
+local storeStand = game:GetService("ReplicatedStorage").StoreStand
 
 local spawn, wait = task.spawn, task.wait 
 local cam = workspace.Camera
@@ -36,7 +37,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Candy
 local npcFarm = library:CreateWindow("NPC Farm")
 local itemFarm = library:CreateWindow("Item Farm")
 local standFarm = library:CreateWindow("Stand Farm")
---local miscUI = library:CreateWindow("Misc")
+local miscUI = library:CreateWindow("Misc")
 
 local options = {
 	npcFarm = {
@@ -341,6 +342,22 @@ do --stand Farm
 		end)
 	end
 end
+do -- misc
+	miscUI:Section("")
+	for _,v in next, player.StandSlots:GetChildren() do
+		local slot = v.Name:split("Slot")[2]
+		local stand = v:FindFirstChild('Stand')
+		local attr = v:FindFirstChild('Attribute')
+
+		local button = miscUI:Button(stand.Value .. " | ".. attr.Value, function()
+			storeStand:FireServer(tonumber(slot))
+		end)
+		stand:GetPropertyChangedSignal('Value'):Connect(function()
+			button.Self:FindFirstChildOfClass('TextButton').Text = stand.Value .. " | ".. attr.Value
+		end)
+	end
+	miscUI:Section("")
+end
 do --functions
 	function useAbilities()
 		local function presskey(keyCode, time)
@@ -486,7 +503,7 @@ do --functions
 	function startStandFarm()
 		curr = player.Data.Stand.Value .. "/" .. player.Data.Attribute.Value
 		data = curr:split("/")
-		function useItem()
+		local function useItem()
 			local useItem = game:GetService("ReplicatedStorage").Useitem
 			if player.PlayerGui:FindFirstChild("ItemPrompt") ~= nil then
 				player.PlayerGui:FindFirstChild("ItemPrompt"):Destroy()
