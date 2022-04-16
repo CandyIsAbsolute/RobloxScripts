@@ -283,7 +283,7 @@ do --stand Farm
 			"Both"
 		}
 	}):Refresh({
-		"Both"
+		"Any"
 	})
 	standFarm:Section("Select Stand").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
 	standFarm:SearchBox("Select Stand", {
@@ -494,9 +494,6 @@ do --functions
 		data = curr:split("/")
 		local function useItem()
 			local useItem = game:GetService("ReplicatedStorage").Useitem
-			if player.PlayerGui:FindFirstChild("ItemPrompt") ~= nil then
-				player.PlayerGui:FindFirstChild("ItemPrompt"):Destroy()
-			end
 			if data[1] == "None" then
 				local arr = player.Backpack:FindFirstChild("Unusual Arrow") or player.Backpack:WaitForChild("Stand Arrow", 9e99)
 				chr:WaitForChild("Humanoid", 387420489):EquipTool(arr)
@@ -560,9 +557,10 @@ do --functions
 			if options.standFarm.prioritize == "Both" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) and table.find(v, data[2]) then
-						if not data[1] == "None" then 
+						if data[1] ~= "None" then 
 							print("gotboth")
 							toggleStandFarm:Set(false)
+							options.standFarm.enabled = false
 							break
 						end
 					end
@@ -570,9 +568,10 @@ do --functions
 			elseif options.standFarm.prioritize == "Any" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) or table.find(v, data[2]) then
-						if not data[1] == "None" then 
+						if data[1] ~= "None" then 
 							print("got any")
 							toggleStandFarm:Set(false)
+							options.standFarm.enabled = false
 							break
 						end
 					end
@@ -580,9 +579,10 @@ do --functions
 			elseif options.standFarm.prioritize == "Stand" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) ~= nil then
-						if not data[1] == "None" then 
+						if not data[1] ~= "None" then 
 							print("got stand")
 							toggleStandFarm:Set(false)
+							options.standFarm.enabled = false
 							break
 						end
 					end
@@ -592,11 +592,12 @@ do --functions
 					if table.find(v, data[2]) ~= nil then
 						print("got attr")
 						toggleStandFarm:Set(false)
+						options.standFarm.enabled = false
 						break
 					end
 				end
 			end
-			if not options.standFarm.enabled then
+			if options.standFarm.enabled == false then
 				break
 			end
 			useItem()
