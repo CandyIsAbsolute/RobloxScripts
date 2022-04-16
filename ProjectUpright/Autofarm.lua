@@ -239,7 +239,10 @@ do --stand Farm
 			"Star Platinum",
 			"Legendary"
 		},
-		
+		{
+			"Tusk Act 1",
+			"Legendary"
+		},
 	}
 	do--add stands & attributes
 		local blacklist = {
@@ -255,6 +258,9 @@ do --stand Farm
 			[10] = "Star Platinum OVA Over Heaven",
 			[11] = "The World Over Heaven",
 			[12] = "C-Moon",
+			[13] = "Tusk Act 2",
+			[14] = "Tusk Act 3",
+			[15] = "Tusk Act 4",
 		}
 		for _, v in next, require(game:GetService("Lighting").StandStats) do
 			if not table.find(blacklist, v.Name) then
