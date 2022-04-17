@@ -183,7 +183,6 @@ local defaults; do
             local callback = callback or function() end;
             
             location[flag] = default;
-            local x, y = game:GetService('TextService'):GetTextSize("\r" .. name, library.options.fontsize, library.options.font, Vector2.new(20, 20))
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -205,7 +204,7 @@ local defaults; do
                         Font = library.options.font;
                         TextSize = library.options.fontsize;
                         Name = 'Checkmark';
-                        Size = UDim2.new(0, 20 + x, 0, 20 + y);
+                        Size = UDim2.new(0, 20, 0, 20);
                         Position = UDim2.new(1, -25, 0, 4);
                         TextColor3 = library.options.textcolor;
                         BackgroundColor3 = library.options.bgcolor;
