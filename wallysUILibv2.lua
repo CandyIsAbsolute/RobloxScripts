@@ -183,6 +183,7 @@ local defaults; do
             local callback = callback or function() end;
             
             location[flag] = default;
+            local x, y = game:GetService('TextService'):GetTextSize("\r" .. name, library.options.fontsize, library.options.font, Vector2.new(20, 20))
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -204,7 +205,7 @@ local defaults; do
                         Font = library.options.font;
                         TextSize = library.options.fontsize;
                         Name = 'Checkmark';
-                        Size = UDim2.new(0, 20, 0, 20);
+                        Size = UDim2.new(0, 20 + x, 0, 20 + y);
                         Position = UDim2.new(1, -25, 0, 4);
                         TextColor3 = library.options.textcolor;
                         BackgroundColor3 = library.options.bgcolor;
@@ -235,13 +236,15 @@ local defaults; do
                     location[flag] = b;
                     callback(location[flag])
                     check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
-                end
+                end,
+                Options = location,
+                Flag = location[flag]
             }
         end
         
         function types:Button(name, callback)
             callback = callback or function() end;
-            local textSize = game:GetService('TextService'):GetTextSize("\r" .. name, library.options.fontsize, library.options.font, Vector2.new(-10, 20))
+            
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -255,7 +258,7 @@ local defaults; do
                     TextStrokeColor3 = library.options.strokecolor;
                     TextColor3 = library.options.textcolor;
                     Position = UDim2.new(0, 5, 0, 5);
-                    Size     = UDim2.new(1, -10, 0, textSize.Y);
+                    Size     = UDim2.new(1, -10, 0, 20);
                     Font = library.options.font;
                     TextSize = library.options.fontsize;
                 });
@@ -272,7 +275,7 @@ local defaults; do
                 Fire = function()
                     callback();
                 end,
-                Self = check
+                Self = check,
             }
         end
         
@@ -352,7 +355,10 @@ local defaults; do
             end
             
             self:Resize();
-            return box
+            return {
+                Options = location,
+                Flag = location[flag]
+            }
         end
         
         function types:Bind(name, options, callback)
@@ -672,7 +678,9 @@ local defaults; do
                     overlay.Container.ValueLabel.Text  = number
                     location[flag] = number
                     callback(number)
-                end
+                end,
+                Options = location,
+                Flag = location[flag]
             }
         end 
 
@@ -794,7 +802,10 @@ local defaults; do
             end]]
             self:Resize();
             
-            return {}
+            return {
+                Options = location,
+                Flag = location[flag]
+            }
         end
         
         function types:Dropdown(name, options, callback)
@@ -955,7 +966,9 @@ local defaults; do
             end
 
             return {
-                Refresh = reload;
+                Refresh = reload,
+                Options = location,
+                Flag = location[flag]
             }
         end
     end
