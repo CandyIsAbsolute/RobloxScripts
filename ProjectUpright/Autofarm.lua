@@ -111,6 +111,9 @@ do --npc Farm
 				wait(3)
 				chr:FindFirstChild("HumanoidRootPart").CFrame = oldpos
 			end)
+			if clipping then
+				noClip()
+			end
 			chr:FindFirstChild("HumanoidRootPart").bV.MaxForce = Vector3.new()
 			chr:FindFirstChild("HumanoidRootPart").bAV.MaxTorque = Vector3.new()
 		end
