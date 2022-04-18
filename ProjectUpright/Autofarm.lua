@@ -465,6 +465,7 @@ do --functions
 			if not options.npcFarm.enabledDungeonFarm then
 				break
 			end
+			noClip()
 			startDungeonFarm()
 			break
 		end
