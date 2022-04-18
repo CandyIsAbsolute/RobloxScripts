@@ -236,8 +236,16 @@ local defaults; do
                     callback(location[flag])
                     check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
                 end,
-                Options = location,
-                Flag = location[flag]
+                Options = location or {},
+                Flag = (function()
+                    value = location[flag]
+                    spawn(function()
+                        while wait() do
+                            value = location[flag]
+                        end
+                    end)
+                    return location[flag]
+                end)()
             }
         end
         
@@ -355,8 +363,16 @@ local defaults; do
             
             self:Resize();
             return {
-                Options = location,
-                Flag = location[flag]
+                Options = location or {},
+                Flag = (function()
+                    value = location[flag]
+                    spawn(function()
+                        while wait() do
+                            value = location[flag]
+                        end
+                    end)
+                    return location[flag]
+                end)()
             }
         end
         
@@ -678,8 +694,16 @@ local defaults; do
                     location[flag] = number
                     callback(number)
                 end,
-                Options = location,
-                Flag = location[flag]
+                Options = location or {},
+                Flag = (function()
+                    value = location[flag]
+                    spawn(function()
+                        while wait() do
+                            value = location[flag]
+                        end
+                    end)
+                    return location[flag]
+                end)()
             }
         end 
 
@@ -802,8 +826,16 @@ local defaults; do
             self:Resize();
             
             return {
-                Options = location,
-                Flag = location[flag]
+                Options = location or {},
+                Flag = (function()
+                    value = location[flag]
+                    spawn(function()
+                        while wait() do
+                            value = location[flag]
+                        end
+                    end)
+                    return value
+                end)()
             }
         end
         
@@ -966,8 +998,16 @@ local defaults; do
 
             return {
                 Refresh = reload,
-                Options = location,
-                Flag = location[flag]
+                Options = location or {},
+                Flag = (function()
+                    value = location[flag]
+                    spawn(function()
+                        while wait() do
+                            value = location[flag]
+                        end
+                    end)
+                    return location[flag]
+                end)()
             }
         end
     end
