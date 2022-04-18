@@ -455,8 +455,9 @@ do --functions
 						if v == nil or v:FindFirstChild("HumanoidRootPart") == nil then
 							return
 						end
+						local enemy = v
 						game:GetService("RunService").Stepped:wait()
-						chr:WaitForChild("HumanoidRootPart", 9e9).CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0, 0, options.npcFarm.selectedDistance) 
+						chr.HumanoidRootPart.CFrame = CFrame.new(enemy.HumanoidRootPart.Position.X, enemy.HumanoidRootPart.Position.Y + options.npcFarm.selectedDistance, enemy.HumanoidRootPart.Position.Z) * CFrame.Angles(-math.rad(90), 0, -math.rad(180))
 						useAbilities()
 					until v.Parent ~= oldParent or 1 > v:WaitForChild("Humanoid").Health 
 				end
