@@ -217,8 +217,8 @@ local defaults; do
             });
             local value = false
             local function click(t)
-                value = location[flag]
                 location[flag] = not location[flag];
+                value = location[flag]
                 callback(location[flag])
                 check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
             end
@@ -763,9 +763,8 @@ local defaults; do
                                 busy = false;
 
                                 location[flag] = v;
-                                value = location[flag]
                                 callback(location[flag])
-
+                                value = location[flag]
                                 box:FindFirstChild('Box').Container.ScrollBarThickness = 0
                                 for i, child in next, box:FindFirstChild('Box').Container:GetChildren() do
                                     if (not child:IsA('UIListLayout')) then
@@ -925,9 +924,8 @@ local defaults; do
                         check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').Text = btn.Text;
 
                         location[flag] = v;
-                        value = location[flag]
                         callback(location[flag])
-
+                        value = location[flag]
                         game:GetService('Debris'):AddItem(container, 0)
                         input:disconnect();
                     end)
