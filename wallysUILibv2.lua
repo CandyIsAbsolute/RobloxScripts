@@ -215,8 +215,9 @@ local defaults; do
                 });
                 Parent = self.container;
             });
-                
+            local value = false
             local function click(t)
+                value = location[flag]
                 location[flag] = not location[flag];
                 callback(location[flag])
                 check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
@@ -237,15 +238,7 @@ local defaults; do
                     check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
                 end,
                 Options = location or {},
-                Flag = (function()
-                    value = location[flag]
-                    spawn(function()
-                        while wait() do
-                            value = location[flag]
-                        end
-                    end)
-                    return location[flag]
-                end)()
+                Flag = value
             }
         end
         
@@ -336,7 +329,7 @@ local defaults; do
                 });
                 Parent = self.container;
             });
-        
+            local value = location[flag]
             local box = check:FindFirstChild(name):FindFirstChild('Box');
             box.FocusLost:connect(function(e)
                 local old = location[flag];
@@ -346,10 +339,12 @@ local defaults; do
                         box.Text = tonumber(location[flag])
                     else
                         location[flag] = math.clamp(num, min, max)
+                        value = location[flag]
                         box.Text = tonumber(location[flag])
                     end
                 else
                     location[flag] = tostring(box.Text)
+                    value = location[flag]
                 end
 
                 callback(location[flag], old, e)
@@ -364,15 +359,7 @@ local defaults; do
             self:Resize();
             return {
                 Options = location or {},
-                Flag = (function()
-                    value = location[flag]
-                    spawn(function()
-                        while wait() do
-                            value = location[flag]
-                        end
-                    end)
-                    return location[flag]
-                end)()
+                Flag = value
             }
         end
         
@@ -544,7 +531,7 @@ local defaults; do
             local callback = callback or function() end
 
             location[flag] = default;
-
+            local value = location[flag]
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -634,6 +621,7 @@ local defaults; do
                         overlay.Container.ValueLabel.Text = value;
                         callback(tonumber(value))
                         location[flag] = tonumber(value)
+                        value = location[flag]
                     end)
                 end
 
@@ -695,15 +683,7 @@ local defaults; do
                     callback(number)
                 end,
                 Options = location or {},
-                Flag = (function()
-                    value = location[flag]
-                    spawn(function()
-                        while wait() do
-                            value = location[flag]
-                        end
-                    end)
-                    return location[flag]
-                end)()
+                Flag = value
             }
         end 
 
@@ -749,7 +729,7 @@ local defaults; do
                 });
                 Parent = self.container;
             })
-
+            local value = location[flag]
             local function rebuild(text)
                 box:FindFirstChild('Box').Container.ScrollBarThickness = 0
                 for i, child in next, box:FindFirstChild('Box').Container:GetChildren() do
@@ -783,6 +763,7 @@ local defaults; do
                                 busy = false;
 
                                 location[flag] = v;
+                                value = location[flag]
                                 callback(location[flag])
 
                                 box:FindFirstChild('Box').Container.ScrollBarThickness = 0
@@ -827,15 +808,7 @@ local defaults; do
             
             return {
                 Options = location or {},
-                Flag = (function()
-                    value = location[flag]
-                    spawn(function()
-                        while wait() do
-                            value = location[flag]
-                        end
-                    end)
-                    return value
-                end)()
+                Flag = value
             }
         end
         
@@ -846,10 +819,11 @@ local defaults; do
             local list = options.list or {};
 
             location[flag] = list[1]
+            local value = location[flag]
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
-                BackgroundColor3 = Color3.fromRGB(25, 25, 25);
+                BackgroundColor3 = Color3.fromRGB(24, 12, 12);
                 BorderSizePixel = 0;
                 LayoutOrder = self:GetOrder();
                 library:Create('Frame', {
@@ -951,6 +925,7 @@ local defaults; do
                         check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').Text = btn.Text;
 
                         location[flag] = v;
+                        value = location[flag]
                         callback(location[flag])
 
                         game:GetService('Debris'):AddItem(container, 0)
@@ -999,15 +974,7 @@ local defaults; do
             return {
                 Refresh = reload,
                 Options = location or {},
-                Flag = (function()
-                    value = location[flag]
-                    spawn(function()
-                        while wait() do
-                            value = location[flag]
-                        end
-                    end)
-                    return location[flag]
-                end)()
+                Flag = value
             }
         end
     end
