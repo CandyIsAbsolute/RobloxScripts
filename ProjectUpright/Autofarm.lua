@@ -280,7 +280,7 @@ do --stand Farm
 		flag = "enabled",
 	}, function()
 		spawn(startStandFarm)
-		if options.standFarm.enabled then
+		if options.standFarm.enabled and rconsoleclear ~= nil then
 			rconsoleclear()
 		end
 	end)
@@ -566,14 +566,15 @@ do --functions
 		while options.standFarm.enabled do
 			curr = tostring(player.Data.Stand.Value) .. "/" .. tostring(player.Data.Attribute.Value)
 			data = curr:split("/")
-			rconsolewarn('Got: \n	Stand: '..data[1]..'\n	Attribute: '..data[2])
+			local console = warn or rconsolewarn 
+			console('Got: \n	Stand: '..data[1]..'\n	Attribute: '..data[2])
 			wait()
 			
 			if options.standFarm.prioritize == "Both" then
 				for _, v in next, configs do
 					if table.find(v, data[1]) and table.find(v, data[2]) then
 						if data[1] ~= "None" then 
-							rconsolewarn("Got wanted stand, stopping...")
+							console("Got wanted stand, stopping...")
 							toggleStandFarm:Set(false)
 							options.standFarm.enabled = false
 							break
@@ -584,7 +585,7 @@ do --functions
 				for _, v in next, configs do
 					if table.find(v, data[1]) or table.find(v, data[2]) then
 						if data[1] ~= "None" then 
-							rconsolewarn("Got wanted stand, stopping...")
+							console("Got wanted stand, stopping...")
 							toggleStandFarm:Set(false)
 							options.standFarm.enabled = false
 							break
@@ -595,7 +596,7 @@ do --functions
 				for _, v in next, configs do
 					if table.find(v, data[1]) ~= nil then
 						if not data[1] ~= "None" then 
-							rconsolewarn("Got wanted stand, stopping...")
+							console("Got wanted stand, stopping...")
 							toggleStandFarm:Set(false)
 							options.standFarm.enabled = false
 							break
@@ -605,7 +606,7 @@ do --functions
 			elseif options.standFarm.prioritize == "Attribute" then
 				for _, v in next, configs do
 					if table.find(v, data[2]) ~= nil then
-						rconsolewarn("Got wanted attribute, stopping...")
+						console("Got wanted attribute, stopping...")
 						toggleStandFarm:Set(false)
 						options.standFarm.enabled = false
 						break
