@@ -566,7 +566,7 @@ do --functions
 		while options.standFarm.enabled do
 			curr = tostring(player.Data.Stand.Value) .. "/" .. tostring(player.Data.Attribute.Value)
 			data = curr:split("/")
-			local console = warn or rconsolewarn 
+			local console = rconsolewarn or warn 
 			console('Got: \n	Stand: '..data[1]..'\n	Attribute: '..data[2])
 			wait()
 			
