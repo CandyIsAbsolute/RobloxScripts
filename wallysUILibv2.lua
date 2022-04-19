@@ -182,15 +182,7 @@ local defaults; do
             local flag     = options.flag or "";
             local callback = callback or function() end;
             location[flag] = default;
-            local lol = {
-                Set = function(self, b)
-                    location[flag] = b;
-                    value = location[flag]
-                    callback(location[flag])
-                    check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
-                end,
-                Flag = location[flag]
-            }
+
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -223,6 +215,15 @@ local defaults; do
                 });
                 Parent = self.container;
             });
+            local lol = {
+                Set = function(self, b)
+                    location[flag] = b;
+                    value = location[flag]
+                    callback(location[flag])
+                    check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
+                end,
+                Flag = location[flag]
+            }
             function click(t)
                 location[flag] = not location[flag];
                 lol.Flag = location[flag]
@@ -530,23 +531,6 @@ local defaults; do
             local callback = callback or function() end
             
             location[flag] = default;
-            local lol = {
-                Flag = location[flag],
-                Set = function(self, value)
-                    local percent = 1 - ((max - value) / (max - min))
-                    local number  = value 
-
-                    number = tonumber(string.format("%.2f", number))
-                    if (not precise) then
-                        number = math.floor(number)
-                    end
-
-                    overlay.Container.Button.Position  = UDim2.new(math.clamp(percent, 0, 0.99), 0,  0, 1) 
-                    overlay.Container.ValueLabel.Text  = number
-                    location[flag] = number
-                    callback(number)
-                end,
-            }
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -607,9 +591,26 @@ local defaults; do
                 });
                 Parent = self.container;
             });
+            
 
             local overlay = check:FindFirstChild(name);
+            local lol = {
+                Flag = location[flag],
+                Set = function(self, value)
+                    local percent = 1 - ((max - value) / (max - min))
+                    local number  = value 
 
+                    number = tonumber(string.format("%.2f", number))
+                    if (not precise) then
+                        number = math.floor(number)
+                    end
+
+                    overlay.Container.Button.Position  = UDim2.new(math.clamp(percent, 0, 0.99), 0,  0, 1) 
+                    overlay.Container.ValueLabel.Text  = number
+                    location[flag] = number
+                    callback(number)
+                end,
+            }
             local renderSteppedConnection;
             local inputBeganConnection;
             local inputEndedConnection;
