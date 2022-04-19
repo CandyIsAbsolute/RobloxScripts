@@ -233,15 +233,17 @@ local defaults; do
             end
 
             self:Resize();
-            return {
-                Set = function(self, b)
-                    location[flag] = b;
-                    callback(location[flag])
-                    check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
-                end,
-                Options = location or {},
-                Flag = value
-            }
+            return setmetatable({}, {
+                __index = {
+                    Set = function(self, b)
+                        location[flag] = b;
+                        value = location[flag]
+                        callback(location[flag])
+                        check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
+                    end,
+                    Flag = value
+                }
+            })
         end
         
         function types:Button(name, callback)
