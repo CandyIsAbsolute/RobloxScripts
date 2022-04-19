@@ -183,6 +183,8 @@ local defaults; do
             local callback = callback or function() end;
             
             location[flag] = default;
+            local value = location[flag]
+
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -288,9 +290,10 @@ local defaults; do
             local callback = callback or function() end;
             local min      = options.min or 0;
             local max      = options.max or 9e9;
-
+            local value 
             if type == 'number' and (not tonumber(default)) then
                 location[flag] = default;
+                value = location[flag]
             else
                 location[flag] = "";
                 default = "";
@@ -329,7 +332,7 @@ local defaults; do
                 });
                 Parent = self.container;
             });
-            local value = location[flag]
+            value = location[flag]
             local box = check:FindFirstChild(name):FindFirstChild('Box');
             box.FocusLost:connect(function(e)
                 local old = location[flag];
@@ -372,6 +375,7 @@ local defaults; do
 
             if keyboardOnly and (not tostring(default):find('MouseButton')) then
                 location[flag] = default
+                
             end
             
             local banned = {
