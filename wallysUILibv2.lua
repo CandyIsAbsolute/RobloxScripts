@@ -216,7 +216,7 @@ local defaults; do
                 Parent = self.container;
             });
             local function click(t)
-                print(self)
+                table.foreach(self, print)
                 location[flag] = not location[flag];
                 callback(location[flag])
                 check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
