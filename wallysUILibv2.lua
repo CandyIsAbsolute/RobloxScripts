@@ -181,9 +181,8 @@ local defaults; do
             local location = options.location or self.flags;
             local flag     = options.flag or "";
             local callback = callback or function() end;
-            
+            local value
             location[flag] = default;
-            local value = location[flag]
 
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
@@ -217,10 +216,8 @@ local defaults; do
                 });
                 Parent = self.container;
             });
-            local value = false
             local function click(t)
                 location[flag] = not location[flag];
-                value = location[flag]
                 callback(location[flag])
                 check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
             end
@@ -231,7 +228,11 @@ local defaults; do
             if location[flag] == true then
                 callback(location[flag])
             end
-
+            spawn(function()
+                while true do wait()
+                    value = location[flag]
+                end
+            end)
             self:Resize();
             return setmetatable({}, {
                 __index = {
