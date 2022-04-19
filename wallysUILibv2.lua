@@ -1,4 +1,5 @@
 local library = {count = 0, queue = {}, callbacks = {}, rainbowtable = {}, toggled = true, binds = {}};
+
 local defaults; do
     local dragger = {}; do
         local mouse        = game:GetService("Players").LocalPlayer:GetMouse();
@@ -119,7 +120,6 @@ local defaults; do
                 container = newWindow.container;
                 toggled = true;
                 flags   = {};
-
             }, types)
 
             table.insert(library.queue, {
@@ -182,7 +182,15 @@ local defaults; do
             local flag     = options.flag or "";
             local callback = callback or function() end;
             location[flag] = default;
-
+            local lol = {
+                Set = function(self, b)
+                    location[flag] = b;
+                    value = location[flag]
+                    callback(location[flag])
+                    check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
+                end,
+                Flag = location[flag]
+            }
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -215,9 +223,9 @@ local defaults; do
                 });
                 Parent = self.container;
             });
-            local function click(t)
-                table.foreach(self, print)
+            function click(t)
                 location[flag] = not location[flag];
+                lol.Flag = location[flag]
                 callback(location[flag])
                 check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
             end
@@ -230,14 +238,7 @@ local defaults; do
             end
 
             self:Resize();
-            return {
-                Set = function(self, b)
-                    location[flag] = b;
-                    value = location[flag]
-                    callback(location[flag])
-                    check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
-                end,
-            }
+            return lol
         end
         
         function types:Button(name, callback)
@@ -286,12 +287,15 @@ local defaults; do
             local callback = callback or function() end;
             local min      = options.min or 0;
             local max      = options.max or 9e9;
-            local value 
+            local lol = {
+                Flag = location[flag]
+            }
             if type == 'number' and (not tonumber(default)) then
                 location[flag] = default;
-                value = location[flag]
+                lol.Flag = location[flag]
             else
                 location[flag] = "";
+                lol.Flag = location[flag]
                 default = "";
             end
 
@@ -328,7 +332,6 @@ local defaults; do
                 });
                 Parent = self.container;
             });
-            value = location[flag]
             local box = check:FindFirstChild(name):FindFirstChild('Box');
             box.FocusLost:connect(function(e)
                 local old = location[flag];
@@ -338,12 +341,12 @@ local defaults; do
                         box.Text = tonumber(location[flag])
                     else
                         location[flag] = math.clamp(num, min, max)
-                        value = location[flag]
+                        lol.Flag = location[flag]
                         box.Text = tonumber(location[flag])
                     end
                 else
                     location[flag] = tostring(box.Text)
-                    value = location[flag]
+                    lol.Flag = location[flag]
                 end
 
                 callback(location[flag], old, e)
@@ -356,10 +359,7 @@ local defaults; do
             end
             
             self:Resize();
-            return {
-                Options = location or {},
-                Flag = value
-            }
+            return lol
         end
         
         function types:Bind(name, options, callback)
@@ -371,7 +371,6 @@ local defaults; do
 
             if keyboardOnly and (not tostring(default):find('MouseButton')) then
                 location[flag] = default
-                
             end
             
             local banned = {
@@ -529,9 +528,25 @@ local defaults; do
             local precise  = options.precise  or false -- e.g 0, 1 vs 0, 0.1, 0.2, ...
             local flag     = options.flag or "";
             local callback = callback or function() end
-
+            
             location[flag] = default;
-            local value = location[flag]
+            local lol = {
+                Flag = location[flag],
+                Set = function(self, value)
+                    local percent = 1 - ((max - value) / (max - min))
+                    local number  = value 
+
+                    number = tonumber(string.format("%.2f", number))
+                    if (not precise) then
+                        number = math.floor(number)
+                    end
+
+                    overlay.Container.Button.Position  = UDim2.new(math.clamp(percent, 0, 0.99), 0,  0, 1) 
+                    overlay.Container.ValueLabel.Text  = number
+                    location[flag] = number
+                    callback(number)
+                end,
+            }
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -621,7 +636,7 @@ local defaults; do
                         overlay.Container.ValueLabel.Text = value;
                         callback(tonumber(value))
                         location[flag] = tonumber(value)
-                        value = location[flag]
+                        lol.Flag = location[flag]
                     end)
                 end
 
@@ -667,24 +682,7 @@ local defaults; do
             end
 
             self:Resize();
-            return {
-                Set = function(self, value)
-                    local percent = 1 - ((max - value) / (max - min))
-                    local number  = value 
-
-                    number = tonumber(string.format("%.2f", number))
-                    if (not precise) then
-                        number = math.floor(number)
-                    end
-
-                    overlay.Container.Button.Position  = UDim2.new(math.clamp(percent, 0, 0.99), 0,  0, 1) 
-                    overlay.Container.ValueLabel.Text  = number
-                    location[flag] = number
-                    callback(number)
-                end,
-                Options = location or {},
-                Flag = value
-            }
+            return lol
         end 
 
         function types:SearchBox(text, options, callback)
@@ -729,7 +727,9 @@ local defaults; do
                 });
                 Parent = self.container;
             })
-            local value = location[flag]
+            local lol = {
+                Flag = location[flag]
+            }
             local function rebuild(text)
                 box:FindFirstChild('Box').Container.ScrollBarThickness = 0
                 for i, child in next, box:FindFirstChild('Box').Container:GetChildren() do
@@ -763,8 +763,8 @@ local defaults; do
                                 busy = false;
 
                                 location[flag] = v;
+                                lol.Flag = location[flag]
                                 callback(location[flag])
-                                value = location[flag]
                                 box:FindFirstChild('Box').Container.ScrollBarThickness = 0
                                 for i, child in next, box:FindFirstChild('Box').Container:GetChildren() do
                                     if (not child:IsA('UIListLayout')) then
@@ -805,10 +805,7 @@ local defaults; do
             end]]
             self:Resize();
             
-            return {
-                Options = location or {},
-                Flag = value
-            }
+            return lol
         end
         
         function types:Dropdown(name, options, callback)
@@ -818,7 +815,10 @@ local defaults; do
             local list = options.list or {};
 
             location[flag] = list[1]
-            local value = location[flag]
+            local lol = {
+                Flag = location[flag],
+                Refresh = reload,
+            }
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -925,7 +925,7 @@ local defaults; do
 
                         location[flag] = v;
                         callback(location[flag])
-                        value = location[flag]
+                        lol.Flag = location[flag]
                         game:GetService('Debris'):AddItem(container, 0)
                         input:disconnect();
                     end)
@@ -958,7 +958,7 @@ local defaults; do
             end)
             
             self:Resize();
-            local function reload(self, array)
+            function reload(self, array)
                 options = array;
                 location[flag] = array[1];
                 pcall(function()
@@ -969,11 +969,7 @@ local defaults; do
                 game:GetService('Debris'):AddItem(container, 0)
             end
 
-            return {
-                Refresh = reload,
-                Options = location or {},
-                Flag = value
-            }
+            return lol
         end
     end
     
@@ -1090,5 +1086,4 @@ local defaults; do
         end
     end)
 end
-
 return library
