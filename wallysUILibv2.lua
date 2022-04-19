@@ -816,19 +816,7 @@ local defaults; do
             local list = options.list or {};
 
             location[flag] = list[1]
-            local lol = {
-                Flag = location[flag],
-                Refresh = function(self, array)
-                    options = array;
-                    location[flag] = array[1];
-                    pcall(function()
-                        input:disconnect()
-                    end)
-                    check:WaitForChild('dropdown_lbl').Selection.Text = location[flag]
-                    check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').TextColor3 = library.options.textcolor
-                    game:GetService('Debris'):AddItem(container, 0)
-                end,
-            }
+
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -871,7 +859,19 @@ local defaults; do
             
             local button = check:FindFirstChild('dropdown_lbl').drop;
             local input;
-
+            local lol = {
+                Flag = location[flag],
+                Refresh = function(self, array)
+                    options = array;
+                    location[flag] = array[1];
+                    pcall(function()
+                        input:disconnect()
+                    end)
+                    check:WaitForChild('dropdown_lbl').Selection.Text = location[flag]
+                    check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').TextColor3 = library.options.textcolor
+                    game:GetService('Debris'):AddItem(container, 0)
+                end,
+            }
             button.MouseButton1Click:connect(function()
                 if (input and input.Connected) then
                     return
