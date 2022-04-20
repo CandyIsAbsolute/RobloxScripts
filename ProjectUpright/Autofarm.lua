@@ -477,12 +477,6 @@ spawn(function()
 				createDungeon()
 			end)
 		end;
-		if not npc_toggle.Flag or not npc_dung_toggle.Flag or not item_toggle.Flag then
-			pcall(function()
-				anchored = false;
-				clipping = false
-			end)
-		end
 	end
 end)
 spawn(function()
@@ -587,6 +581,31 @@ spawn(function()
 		else
 			hrp:WaitForChild("bV", 387420489).MaxForce = Vector3.new()
 			hrp:WaitForChild("bAV", 387420489).MaxTorque = Vector3.new()
+		end
+	end
+end)
+spawn(function()
+	while true do game:GetService("RunService").Stepped:Wait()
+		if not npc_toggle.Flag then
+			if npc_dung_toggle.Flag or item_toggle.Flag then
+				return 
+			end
+			anchored = false;
+			clipping = false
+		end
+		if not npc_dung_toggle.Flag then
+			if npc_toggle.Flag or item_toggle.Flag then
+				return 
+			end
+			anchored = false;
+			clipping = false
+		end
+		if not item_toggle.Flag then
+			if npc_dung_toggle.Flag or npc_toggle.Flag then
+				return 
+			end
+			anchored = false;
+			clipping = false
 		end
 	end
 end)
