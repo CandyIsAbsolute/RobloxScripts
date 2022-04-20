@@ -729,12 +729,12 @@ local defaults; do
                 Flag = location[flag],
                 Refresh = function(self, array)
                     options = array
+                    busy = true
                     location[flag] = array[1];
-                    pcall(function()
-                        input:disconnect()
-                    end)
                     box:FindFirstChild('Box').Text = location[flag]
                     box:FindFirstChild('Box').TextColor3 = library.options.textcolor
+                    wait()
+                    busy = false
                     return self
                 end,
             }
