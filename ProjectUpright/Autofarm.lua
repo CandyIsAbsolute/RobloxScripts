@@ -464,7 +464,7 @@ spawn(function()
 				createDungeon()
 			end)
 		end;
-		if not npc_toggle.Flag or not npc_dung_toggle.Flag then
+		if not npc_toggle.Flag or not npc_dung_toggle.Flag or not item_toggle.Flag then
 			pcall(function()
 				anchored = false;
 				clipping = false
