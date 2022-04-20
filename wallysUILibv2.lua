@@ -217,6 +217,7 @@ local defaults; do
                 Set = function(self, b)
                     location[flag] = b;
                     value = location[flag]
+                    self.Flag = location[flag]
                     callback(location[flag])
                     check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
                 end,
