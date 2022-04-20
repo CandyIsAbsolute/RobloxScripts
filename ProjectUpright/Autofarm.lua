@@ -4,8 +4,8 @@ local cam = game:GetService("Workspace").CurrentCamera;
 local vim = game:GetService("VirtualInputManager")
 local spawn, wait = task.spawn, task.wait;
 local oldpos;
-local clipping = false;
-local anchored = false;
+clipping = false;
+anchored = false;
 local ability = game:GetService("ReplicatedStorage").Ability;
 local create_lair = game:GetService("ReplicatedStorage").CreateDungeon;
 local storeStand = game:GetService("ReplicatedStorage").StoreStand;
@@ -475,8 +475,6 @@ end)
 spawn(function()
 	while game:GetService("RunService").Stepped:Wait() do
 		if item_toggle.Flag then
-			anchored = true;
-			clipping = true;
 			pcall(function()
 				if game:GetService("Workspace"):FindFirstChild("Unusual Arrow") or game:GetService("Workspace"):FindFirstChild("Stand Arrow") or game:GetService("Workspace"):FindFirstChild("Rokakaka") then
 					for _, v in next, game:GetService("Workspace"):GetChildren() do
@@ -484,6 +482,8 @@ spawn(function()
 							local x, y, z = v.CFrame:components()
 							repeat
 								game:GetService("RunService").Stepped:Wait()
+								anchored = true;
+								clipping = true;
 								if not item_toggle.Flag then
 									return
 								end;
@@ -557,6 +557,7 @@ spawn(function()
 	while true do
 		game:GetService("RunService").Stepped:Wait()
 		if clipping then
+			print('noclipping')
 			for _, v in next, chr:GetDescendants() do
 				if v:IsA("BasePart") then
 					v.CanCollide = false
@@ -569,6 +570,7 @@ spawn(function()
 	while true do
 		game:GetService("RunService").Stepped:Wait()
 		if anchored then
+			print('anchored')
 			hrp:WaitForChild("bV", 387420489).MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 			hrp:WaitForChild("bAV", 387420489).MaxTorque = Vector3.new(1 / 0, 1 / 0, 1 / 0)
 		else
