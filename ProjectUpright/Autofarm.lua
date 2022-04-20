@@ -493,8 +493,6 @@ spawn(function()
 					end
 				else
 					hrp.CFrame = oldpos;
-					anchored = false;
-					clipping = false;
 					game:GetService("Workspace").ChildAdded:Wait()
 					oldpos = hrp.CFrame;
 				end
