@@ -865,7 +865,7 @@ local defaults; do
                     check:WaitForChild('dropdown_lbl').Selection.Text = location[flag]
                     check:FindFirstChild('dropdown_lbl'):WaitForChild('Selection').TextColor3 = library.options.textcolor
                     game:GetService('Debris'):AddItem(container, 0)
-                    return lol
+                    return self
                 end,
             }
             button.MouseButton1Click:connect(function()
