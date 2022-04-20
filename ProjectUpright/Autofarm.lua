@@ -8,7 +8,8 @@ clipping = false;
 anchored = false;
 local ability = game:GetService("ReplicatedStorage").Ability;
 local create_lair = game:GetService("ReplicatedStorage").CreateDungeon;
-local storeStand = game:GetService("ReplicatedStorage").StoreStand;
+local store_stand = game:GetService("ReplicatedStorage").StoreStand;
+local buy_item = game:GetService("ReplicatedStorage").BuyItem
 local npc = library:CreateWindow("Farm NPCs")
 local item = library:CreateWindow("Farm Items")
 local stand = library:CreateWindow("Farm Stand")
@@ -305,7 +306,7 @@ do
 		local attr = v:FindFirstChild('Attribute')
 
 		local button = misc:Button("Stand: "..stand.Value.. "\nAttribute: ".. attr.Value, function()
-			storeStand:FireServer(tonumber(slot))
+			store_stand:FireServer(tonumber(slot))
 		end)
 		stand:GetPropertyChangedSignal('Value'):Connect(function()
 			attr:GetPropertyChangedSignal('Value'):Wait()
@@ -313,7 +314,19 @@ do
 		end)
 	end
 	misc:Section("")
-
+	misc:Button("Buy 5 Stand Arrows", function()
+		buy_item:FireServer("5Stand Arrow")
+	end)
+	misc:Button("Buy 5 Rokakaka Fruits", function()
+		buy_item:FireServer("5Rokakaka")
+	end)
+	misc:Button("Buy Stand Arrow", function()
+		buy_item:FireServer("Stand Arrow")
+	end)
+	misc:Button("Buy Rokakaka Fruit", function()
+		buy_item:FireServer("Rokakaka")
+	end)
+	misc:Section("")
 end
 function useAbilities()
 	if not chr:FindFirstChild("Summoned").Value then
