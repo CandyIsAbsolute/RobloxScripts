@@ -728,9 +728,15 @@ local defaults; do
             local lol = {
                 Flag = location[flag],
                 Refresh = function(self, array)
+                    options = array
                     location[flag] = array[1];
+                    pcall(function()
+                        input:disconnect()
+                    end)
                     box:FindFirstChild('Box').Text = location[flag]
-                end
+                    box:FindFirstChild('Box').TextColor3 = library.options.textcolor
+                    return self
+                end,
             }
             local function rebuild(text)
                 box:FindFirstChild('Box').Container.ScrollBarThickness = 0
@@ -791,7 +797,7 @@ local defaults; do
                 box:FindFirstChild('Box').Container.CanvasSize = UDim2.new(1, 0, 0, (20 * (#c)) - 20)
             end
 
-            box:FindFirstChild('Box'):GetPropertyChangedSignal('Text'):connect(function()
+            input = box:FindFirstChild('Box'):GetPropertyChangedSignal('Text'):connect(function()
                 if (not busy) then
                     rebuild(box:FindFirstChild('Box').Text)
                 end
