@@ -244,7 +244,7 @@ local defaults; do
         
         function types:Button(name, callback)
             callback = callback or function() end;
-            
+            local textSize = game:GetService('TextService'):GetTextSize("\r" .. name, library.options.fontsize, library.options.font, Vector2.new(-10, 20))
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
                 Size = UDim2.new(1, 0, 0, 25);
@@ -258,7 +258,7 @@ local defaults; do
                     TextStrokeColor3 = library.options.strokecolor;
                     TextColor3 = library.options.textcolor;
                     Position = UDim2.new(0, 5, 0, 5);
-                    Size     = UDim2.new(1, -10, 0, 20);
+                    Size     = UDim2.new(1, -10, 0, textSize.Y);
                     Font = library.options.font;
                     TextSize = library.options.fontsize;
                 });
