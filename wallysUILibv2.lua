@@ -158,7 +158,6 @@ local defaults; do
             local y = 0;
             for i, v in next, self.container:GetChildren() do
                 if (not v:IsA('UIListLayout')) then
-                    print(i, v)
                     y = y + v.AbsoluteSize.Y;
                 end
             end 
