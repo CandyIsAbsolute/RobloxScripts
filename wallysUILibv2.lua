@@ -727,7 +727,13 @@ local defaults; do
                 Parent = self.container;
             })
             local lol = {
-                Flag = location[flag]
+                Flag = location[flag],
+                Refresh = function(self, array)
+                    location[flag] = array[1];
+    
+                    box:FindFirstChild('Box').Text = location[flag]
+                    box:FindFirstChild('Box').TextColor3 = library.options.textcolor
+                end
             }
             local function rebuild(text)
                 box:FindFirstChild('Box').Container.ScrollBarThickness = 0
@@ -795,13 +801,6 @@ local defaults; do
             end);
 
 
-            --[[local function reload(self, array)
-                options = array;
-                location[flag] = array[1];
-
-                box:FindFirstChild('Box').Text = location[flag]
-                box:FindFirstChild('Box').TextColor3 = library.options.textcolor
-            end]]
             self:Resize();
             
             return lol
