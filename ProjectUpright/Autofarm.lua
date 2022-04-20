@@ -9,12 +9,11 @@ anchored = false;
 local ability = game:GetService("ReplicatedStorage").Ability;
 local create_lair = game:GetService("ReplicatedStorage").CreateDungeon;
 local store_stand = game:GetService("ReplicatedStorage").StoreStand;
-local buy_item = game:GetService("ReplicatedStorage").BuyItem
+local buy_item = game:GetService("ReplicatedStorage").BuyItem;
 local npc = library:CreateWindow("Farm NPCs")
 local item = library:CreateWindow("Farm Items")
 local stand = library:CreateWindow("Farm Stand")
 local misc = library:CreateWindow("Misc")
-
 local abilities = {}
 local configs = {
 	{
@@ -300,19 +299,18 @@ do
 end;
 do
 	misc:Section("")
-	for _,v in next, plr.StandSlots:GetChildren() do
+	for _, v in next, plr.StandSlots:GetChildren() do
 		local slot = v.Name:split("Slot")[2]
 		local stand = v:FindFirstChild('Stand')
 		local attr = v:FindFirstChild('Attribute')
-
-		local button = misc:Button("Stand: "..stand.Value.. "\nAttribute: ".. attr.Value, function()
+		local button = misc:Button("Stand: " .. stand.Value .. "\nAttribute: " .. attr.Value, function()
 			store_stand:FireServer(tonumber(slot))
 		end)
 		stand:GetPropertyChangedSignal('Value'):Connect(function()
 			attr:GetPropertyChangedSignal('Value'):Wait()
-			button.Self:FindFirstChildOfClass('TextButton').Text = "Stand: "..stand.Value.. "\nAttribute: ".. attr.Value
+			button.Self:FindFirstChildOfClass('TextButton').Text = "Stand: " .. stand.Value .. "\nAttribute: " .. attr.Value
 		end)
-	end
+	end;
 	misc:Section("")
 	misc:Button("Buy 5 Stand Arrows", function()
 		buy_item:FireServer("5Stand Arrow")
@@ -327,7 +325,7 @@ do
 		buy_item:FireServer("Rokakaka")
 	end)
 	misc:Section("")
-end
+end;
 function useAbilities()
 	if not chr:FindFirstChild("Summoned").Value then
 		ability:FireServer("Stand Summon", {})
@@ -406,7 +404,7 @@ function useItem()
 	if not stand_toggle.Flag then
 		return
 	end;
-	local use_item = game:GetService("ReplicatedStorage").Useitem
+	local use_item = game:GetService("ReplicatedStorage").Useitem;
 	if data[1] == "None" then
 		local arrow = plr.Backpack:FindFirstChild("Unusual Arrow") or plr.Backpack:FindFirstChild("Charged Arrow") or plr.Backpack:WaitForChild("Stand Arrow", 387420489)
 		chr.Humanoid:EquipTool(arrow)
@@ -476,7 +474,7 @@ spawn(function()
 				clipping = true;
 				createDungeon()
 			end)
-		end;
+		end
 	end
 end)
 spawn(function()
@@ -501,7 +499,7 @@ spawn(function()
 				else
 					hrp.CFrame = oldpos;
 					game:GetService("Workspace").ChildAdded:Wait()
-					oldpos = hrp.CFrame;
+					oldpos = hrp.CFrame
 				end
 			end)
 		end
@@ -585,25 +583,26 @@ spawn(function()
 	end
 end)
 spawn(function()
-	while true do game:GetService("RunService").Stepped:Wait()
+	while true do
+		game:GetService("RunService").Stepped:Wait()
 		if not npc_toggle.Flag then
 			if npc_dung_toggle.Flag or item_toggle.Flag then
-				return 
-			end
+				return
+			end;
 			anchored = false;
 			clipping = false
-		end
+		end;
 		if not npc_dung_toggle.Flag then
 			if npc_toggle.Flag or item_toggle.Flag then
-				return 
-			end
+				return
+			end;
 			anchored = false;
 			clipping = false
-		end
+		end;
 		if not item_toggle.Flag then
 			if npc_dung_toggle.Flag or npc_toggle.Flag then
-				return 
-			end
+				return
+			end;
 			anchored = false;
 			clipping = false
 		end
