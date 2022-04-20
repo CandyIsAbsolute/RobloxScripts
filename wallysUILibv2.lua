@@ -158,13 +158,12 @@ local defaults; do
             local y = 0;
             for i, v in next, self.container:GetChildren() do
                 if (not v:IsA('UIListLayout')) then
+                    print(i, v)
                     y = y + v.AbsoluteSize.Y;
                 end
             end 
             self.container.Size = UDim2.new(1, 0, 0, y+5)
         end
-        
-        
 
         function types:GetOrder() 
             local c = 0;
@@ -241,13 +240,12 @@ local defaults; do
             self:Resize();
             return lol
         end
-        
         function types:Button(name, callback)
             callback = callback or function() end;
             local textSize = game:GetService('TextService'):GetTextSize("\r" .. name, library.options.fontsize, library.options.font, Vector2.new(-10, 20))
             local check = library:Create('Frame', {
                 BackgroundTransparency = 1;
-                Size = UDim2.new(1, 0, 0, 25);
+                Size = UDim2.new(1, 0, 0, textSize.Y + 5);
                 LayoutOrder = self:GetOrder();
                 library:Create('TextButton', {
                     Name = name;
