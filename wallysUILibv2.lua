@@ -730,9 +730,7 @@ local defaults; do
                 Flag = location[flag],
                 Refresh = function(self, array)
                     location[flag] = array[1];
-    
                     box:FindFirstChild('Box').Text = location[flag]
-                    box:FindFirstChild('Box').TextColor3 = library.options.textcolor
                 end
             }
             local function rebuild(text)
