@@ -221,7 +221,8 @@ local defaults; do
                     callback(location[flag])
                     check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
                 end,
-                Flag = location[flag]
+                Flag = location[flag],
+                Self = check
             }
             function click(t)
                 location[flag] = not location[flag];
