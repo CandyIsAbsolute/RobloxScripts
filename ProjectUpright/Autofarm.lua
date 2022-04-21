@@ -156,43 +156,58 @@ do
 		end)()
 	})
 	npc:Section("Abilities").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(1, 0.435294, 0)
-	npc:Toggle("MB1", {
+	npc:Toggle("Punch", {
 		location = abilities,
 		flag = "punch"
-	}):Set(true)
-	npc:Toggle("E", {
+	})
+	npc:Toggle("Barrage", {
 		location = abilities,
-		flag = "barrage"
-	}):Set(true)
-	npc:Toggle("R", {
+		flag = "E"
+	})
+	npc:Toggle("Heavy Punch", {
 		location = abilities,
 		flag = "R"
-	}):Set(true)
-	npc:Toggle("T", {
-		location = abilities,
-		flag = "T"
-	}):Set(true)
-	npc:Toggle("F", {
-		location = abilities,
-		flag = "F"
 	})
-	npc:Toggle("H", {
-		location = abilities,
-		flag = "H"
-	})
-	npc:Toggle("J", {
-		location = abilities,
-		flag = "J"
-	})
-	npc:Toggle("Z", {
-		location = abilities,
-		flag = "Z"
-	})
-	npc:Toggle("X", {
-		location = abilities,
-		flag = "X"
-	})
-	npc:Section("")
+	do
+		local toggles = {}
+		local t = {}
+		function refreshAbilities()
+			toggles = {}
+			t = {}
+			syn.set_thread_identity(2)
+			for _,v in next, getconnections(game.UserInputService.InputBegan)do
+				if getfenv(v.Function).script.Name == "StandScripts" then
+					for _,v in next, debug.getconstants(v.Function) do
+						table.insert(t, v)
+					end
+				end
+			end
+			syn.set_thread_identity(7)
+			for _,v in next, t do
+				if type(v) == "userdata" and v ~= Enum.KeyCode.Q and v ~= Enum.UserInputType.MouseButton1 and v ~= Enum.KeyCode.R and v ~= Enum.KeyCode.E then
+					if t[_+1] ~= nil then
+						toggle = npc:Toggle(tostring(t[_+1]), {
+							location = abilities,
+							flag = string.char(v.Value):upper()
+						})
+						table.insert(toggles, toggle)
+					end
+				end
+			end
+			
+			on_stand_change = plr.Data.Stand:GetPropertyChangedSignal("Value"):connect(function()
+				plr.Data.Attribute:GetPropertyChangedSignal("Value"):Wait()
+				bottom_section_abilities.Self:Destroy()
+				for _,v in next, toggles do
+					v:Destroy()
+				end
+				spawn(refreshAbilities)
+				bottom_section_abilities = npc:Section("")
+			end)
+		end
+		spawn(refreshAbilities)
+	end
+	bottom_section_abilities = npc:Section("")
 end;
 do
 	item:Section("")
@@ -585,6 +600,10 @@ end)
 spawn(function()
 	while true do
 		game:GetService("RunService").Stepped:Wait()
+		if not npc_toggle.Flag and not npc_dung_toggle.Flag and item_toggle.Flag then
+			anchored = false;
+			clipping = false
+		end
 		if not npc_toggle.Flag then
 			if npc_dung_toggle.Flag or item_toggle.Flag then
 				return
