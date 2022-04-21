@@ -224,6 +224,7 @@ local defaults; do
                 Flag = location[flag],
                 Destroy = function()
                     check:Destroy()
+                    location[flag] = nil
                     self:Resize()
                 end
             }
