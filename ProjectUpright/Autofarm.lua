@@ -160,14 +160,6 @@ do
 		location = abilities,
 		flag = "punch"
 	})
-	npc:Toggle("Barrage", {
-		location = abilities,
-		flag = "E"
-	})
-	npc:Toggle("Heavy Punch", {
-		location = abilities,
-		flag = "R"
-	})
 	do
 		local toggles = {}
 		local t = {}
@@ -184,11 +176,12 @@ do
 			end
 			syn.set_thread_identity(7)
 			for _,v in next, t do
-				if type(v) == "userdata" and v ~= Enum.KeyCode.Q and v ~= Enum.UserInputType.MouseButton1 and v ~= Enum.KeyCode.R and v ~= Enum.KeyCode.E then
+				if type(v) == "userdata" and v ~= Enum.UserInputType.MouseButton1 and v ~= Enum.KeyCode.Q then
 					if t[_+1] ~= nil then
+						print(t[_+1])
 						toggle = npc:Toggle(tostring(t[_+1]), {
 							location = abilities,
-							flag = string.char(v.Value):upper()
+							flag = tostring(t[_+1])
 						})
 						table.insert(toggles, toggle)
 					end
@@ -343,15 +336,10 @@ do
 end;
 function useAbilities()
 	if not chr:FindFirstChild("Summoned").Value then
-		ability:FireServer("Stand Summon", {})
 		repeat
-			wait()
+			ability:FireServer("Stand Summon", {})
+			wait(3)
 		until chr:FindFirstChild("Summoned").Value
-	end;
-	local function presskey(keyCode, time)
-		vim:SendKeyEvent(true, Enum.KeyCode[keyCode], false, game)
-		wait(time)
-		vim:SendKeyEvent(false, Enum.KeyCode[keyCode], false, game)
 	end;
 	for i, v in next, abilities do
 		if v == true then
@@ -360,14 +348,8 @@ function useAbilities()
 					ability:FireServer("Punch", {})
 					wait()
 				end
-			elseif tostring(i) == "R" then
-				ability:FireServer("Heavy Punch", {})
-			elseif tostring(i) == "barrage" then
-				ability:FireServer("Barrage", {
-					true
-				})
 			else
-				presskey(i, 0)
+				ability:FireServer(i, {true})
 			end
 		end
 	end
