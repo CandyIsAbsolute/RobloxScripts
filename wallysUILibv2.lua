@@ -222,7 +222,10 @@ local defaults; do
                     check:FindFirstChild(name).Checkmark.Text = location[flag] and utf8.char(10003) or "";
                 end,
                 Flag = location[flag],
-                Self = check
+                Destroy = function()
+                    check:Destroy()
+                    self:Resize()
+                end
             }
             function click(t)
                 location[flag] = not location[flag];
