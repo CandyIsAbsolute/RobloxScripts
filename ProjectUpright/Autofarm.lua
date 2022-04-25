@@ -582,30 +582,9 @@ end)
 spawn(function()
 	while true do
 		game:GetService("RunService").Stepped:Wait()
-		if not npc_toggle.Flag and not npc_dung_toggle.Flag and item_toggle.Flag then
-			anchored = false;
-			clipping = false
-		end
-		if not npc_toggle.Flag then
-			if npc_dung_toggle.Flag or item_toggle.Flag then
-				return
-			end;
+		if not npc_toggle.Flag and not npc_dung_toggle.Flag and not item_toggle.Flag then
 			anchored = false;
 			clipping = false
 		end;
-		if not npc_dung_toggle.Flag then
-			if npc_toggle.Flag or item_toggle.Flag then
-				return
-			end;
-			anchored = false;
-			clipping = false
-		end;
-		if not item_toggle.Flag then
-			if npc_dung_toggle.Flag or npc_toggle.Flag then
-				return
-			end;
-			anchored = false;
-			clipping = false
-		end
 	end
 end)
