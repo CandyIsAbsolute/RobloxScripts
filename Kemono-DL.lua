@@ -1,4 +1,3 @@
-
 local contents = game:HttpGet(tostring(_G.user))
 
 if not isfolder("Downloads") then
@@ -12,7 +11,7 @@ for _,v in next, contents:split(" ") do
         v = v:gsub('"', "")
         v = v:gsub("\n", "")
         local post_contents = game:HttpGet("https://kemono.party"..v)
-        num = 1
+        num = 0
         for _,v in next, post_contents:split(" ") do
             if v:match(".png") or v:match(".mp4") or v:match(".gif") then
                 if v:match("href=") then
