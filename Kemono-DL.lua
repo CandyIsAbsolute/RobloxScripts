@@ -1,6 +1,5 @@
-local user = "" --input user here, eg: https://kemono.party/patreon/user/123123123
 
-local contents = game:HttpGet(tostring(user))
+local contents = game:HttpGet(tostring(_G.user))
 
 if not isfolder("Downloads") then
     makefolder("Downloads")
