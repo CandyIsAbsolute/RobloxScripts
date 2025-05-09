@@ -107,7 +107,7 @@ local AutoClaw = Library:CreateWindow("Fast Claw") do
     end
     task.spawn(function()
         local special_wait;special_wait = hookfunction(task.wait, function(a)
-            if not checkcaller() then
+            if not checkcaller() and ClawToggled.Flag then
                 a = 0
             end
             return special_wait(a)
