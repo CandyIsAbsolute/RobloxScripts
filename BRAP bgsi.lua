@@ -1,3 +1,4 @@
+
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/CandyIsAbsolute/RobloxScripts/main/wallysUILibv2.lua", true))()
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -5,9 +6,8 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local wait = task.wait
 
-local Event = require(game:GetService("ReplicatedStorage").Shared.Framework.Network.Remote)
-local Function : RemoteFunction = ReplicatedStorage.Shared.Framework.Network.Remote.Function
-local Event : RemoteEvent = ReplicatedStorage.Shared.Framework.Network.Remote.Event
+local Function : RemoteFunction = ReplicatedStorage.Shared.Framework.Network.Remote.RemoteFunction
+local Event : RemoteEvent = ReplicatedStorage.Shared.Framework.Network.Remote.RemoteEvent
 
 local BoardUtil = require(ReplicatedStorage.Shared.Utils.BoardUtil)
 
@@ -92,10 +92,9 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
         end
     end)
 end
-local AutoClaw = Library:CreateWindow("Fast Claw") do
+local AutoClaw = Library:CreateWindow("Robot Claw") do
     AutoClaw:Section("")
-
-    local ClawToggled = AutoClaw:Toggle("Auto Claw", {})
+    local ClawToggledFast = AutoClaw:Toggle("Auto Claw [FAST]", {})
 
     local function ClickButton(Button)
         local pos   = Button.AbsolutePosition
@@ -107,19 +106,25 @@ local AutoClaw = Library:CreateWindow("Fast Claw") do
     end
     task.spawn(function()
         local special_wait;special_wait = hookfunction(task.wait, function(a)
-            if not checkcaller() and ClawToggled.Flag then
+            if not checkcaller() and ClawToggledFast.Flag then
                 a = 0
             end
             return special_wait(a)
         end)
+        local RobotClaw = require(game:GetService("ReplicatedStorage").Client.Gui.Frames.Minigames["Robot Claw"])
+        local instant_finish; instant_finish = hookfunction(RobotClaw, function(a)
+            local cleanup, useless = instant_finish(a)
+            cleanup()
+            return cleanup, useless
+        end)
 
         while true do
-            if ClawToggled.Flag then
+            if ClawToggledFast.Flag then
                 Event:FireServer("StartMinigame", "Robot Claw", "Insane")
-                task.wait()
+                -- task.wait()
                 Event:FireServer("FinishMinigame")
                 Event:FireServer("SkipMinigameCooldown", "Robot Claw")
-                task.wait()
+                -- task.wait()
                 pcall(function()
                     ClickButton(LocalPlayer.PlayerGui.ScreenGui.Prompt.Frame.Main.Buttons.Template.Button) 
                 end)
