@@ -6,8 +6,8 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local wait = task.wait
 
-local Function : RemoteFunction = ReplicatedStorage.Shared.Framework.Network.Remote.RemoteFunction
-local Event : RemoteEvent = ReplicatedStorage.Shared.Framework.Network.Remote.RemoteEvent
+local Function  = ReplicatedStorage.Shared.Framework.Network.Remote.RemoteFunction
+local Event = ReplicatedStorage.Shared.Framework.Network.Remote.RemoteEvent
 
 local BoardUtil = require(ReplicatedStorage.Shared.Utils.BoardUtil)
 
@@ -116,7 +116,9 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
         local RobotClaw = require(game:GetService("ReplicatedStorage").Client.Gui.Frames.Minigames["Robot Claw"])
         local instant_finish; instant_finish = hookfunction(RobotClaw, function(a)
             local cleanup, useless = instant_finish(a)
-            cleanup()
+            if ClawToggledFast.Flag then
+                cleanup() 
+            end
             return cleanup, useless
         end)
 
@@ -125,12 +127,11 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
                 Event:FireServer("StartMinigame", "Robot Claw", "Insane")
                 Event:FireServer("FinishMinigame")
                 Event:FireServer("SkipMinigameCooldown", "Robot Claw")
-                -- task.wait()
                 pcall(function()
                     ClickButton(LocalPlayer.PlayerGui.ScreenGui.Prompt.Frame.Main.Buttons.Template.Button) 
                 end)
             end
-            task.wait()
+            wait()
         end
     end)
     AutoClaw:Section("faaaaaaaart...")
