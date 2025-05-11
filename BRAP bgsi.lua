@@ -151,7 +151,7 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
                 local FirstItem = ClawMachine:FindFirstChild("Capsule")
                 Event:FireServer("GrabMinigameItem", FirstItem:GetAttribute("ItemGUID"))
                 FirstItem:Destroy()
-                
+
                 for _,v in ClawMachine:GetChildren() do
                     if tostring(v) == "Capsule" then
                         task.wait(3.25)
@@ -159,6 +159,7 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
                         v:Destroy()
                     end
                 end
+                wait(.5)
                 Event:FireServer("FinishMinigame")
             end
         end)
