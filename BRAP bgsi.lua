@@ -164,15 +164,17 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
                         v:Destroy()
                     end
                 end
-                wait(.5)
-                Event:FireServer("FinishMinigame")
+                repeat 
+                    Event:FireServer("FinishMinigame")
+                until task.wait() and workspace:FindFirstChild("ClawMachine") == nil
             end
         end)
         workspace.ChildRemoved:Connect(function(Child)
             if ClawToggled.Flag and not ClawToggledFast.Flag and tostring(Child) == "ClawMachine" then
-                Event:FireServer("SkipMinigameCooldown", "Robot Claw")
-                wait(2)
-                Event:FireServer("StartMinigame", "Robot Claw", Difficulty.Flag)
+                repeat 
+                    Event:FireServer("SkipMinigameCooldown", "Robot Claw")
+                    Event:FireServer("StartMinigame", "Robot Claw", Difficulty.Flag)
+                until task.wait() and workspace:FindFirstChild("ClawMachine") ~= nil
             end
         end)
 
@@ -194,4 +196,3 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
     AutoClaw:Section("and it's 13/s faster [Insane]")
     AutoClaw:Section("dont have both enabled or you die")
 end
-print('new changed')
