@@ -30,7 +30,7 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
     GoldenDice = AutoDice:Slider("Golden Dice <", {
         min = 1,
         max = 6,
-        default = 3
+        default = 2
     })
     
     local Status = AutoDice:Section("test").Self
