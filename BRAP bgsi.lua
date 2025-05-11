@@ -148,11 +148,15 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
             if ClawToggled.Flag and not ClawToggledFast.Flag and tostring(Child) == "ClawMachine" then
                 local ClawMachine = Child
                 wait(2)
-                ClawMachine:FindFirstChild("Capsule"):WaitForChild("HitBox", 9e9).CFrame = ClawMachine:FindFirstChild("CollectPart").CFrame 
+                local FirstItem = ClawMachine:FindFirstChild("Capsule")
+                Event:FireServer("GrabMinigameItem", FirstItem:GetAttribute("ItemGUID"))
+                FirstItem:Destroy()
+                
                 for _,v in ClawMachine:GetChildren() do
                     if tostring(v) == "Capsule" then
                         task.wait(3.25)
-                        v.HitBox.CFrame = ClawMachine:FindFirstChild("CollectPart").CFrame
+                        Event:FireServer("GrabMinigameItem", v:GetAttribute("ItemGUID"))
+                        v:Destroy()
                     end
                 end
                 Event:FireServer("FinishMinigame")
