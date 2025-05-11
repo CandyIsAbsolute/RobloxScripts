@@ -16,13 +16,10 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
     local StatusText = ""
 
     AutoDice:Section("made by ydnac2110")
-
-    local AutoRoll = AutoDice:Toggle("Auto Roll", {})
-    
+    local AutoRoll, DefaultDice, GoldenDice
+    AutoRoll = AutoDice:Toggle("Auto Roll", {})
     AutoDice:Section("Configuration").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(0.662745, 0.403921, 1)
-
-    local DefaultDice = AutoDice:Dropdown("Default Dice", {
-        flag = "DefaultDice",
+    DefaultDice = AutoDice:Dropdown("Default Dice", {
         list = {
             "Dice",
             "Giant Dice",
@@ -30,7 +27,7 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
         }
     })
     AutoDice:Section("Depth Settings")
-    local GoldenDice = AutoDice:Slider("Golden Dice <", {
+    GoldenDice = AutoDice:Slider("Golden Dice <", {
         min = 1,
         max = 6,
         default = 3
@@ -94,10 +91,35 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
 end
 local AutoClaw = Library:CreateWindow("Robot Claw") do
     AutoClaw:Section("")
-    local ClawToggledFast = AutoClaw:Toggle("Auto Claw [FAST]", {}, function()
-        Event:FireServer("FinishMinigame")
+    local ClawToggledFast, ClawToggled, Difficulty, AutoRewards
+    ClawToggledFast = AutoClaw:Toggle("Auto Claw [FAST]", {}, function()
+        if not ClawToggledFast.Flag then
+            Event:FireServer("FinishMinigame")
+            pcall(function()
+                workspace:FindFirstChild('ClawMachine'):Destroy()
+            end)
+        end
     end)
-
+    ClawToggled = AutoClaw:Toggle("Auto Claw", {}, function()
+        if ClawToggled.Flag then
+            task.spawn(function()
+                Event:FireServer("FinishMinigame")
+                Event:FireServer("SkipMinigameCooldown", "Robot Claw")
+                wait(.25)
+                Event:FireServer("StartMinigame", "Robot Claw", Difficulty.Flag)            
+            end)
+        end
+    end)
+    AutoClaw:Section("Configuration").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(0.662745, 0.403921, 1)
+    Difficulty = AutoClaw:Dropdown("Difficulty", {
+        list = {
+            "Insane",
+            "Hard",
+            "Medium",
+            "Easy"
+        },
+    })
+    AutoRewards = AutoClaw:Toggle("Auto Claim Rewards", {default = true})
     local function ClickButton(Button)
         local pos   = Button.AbsolutePosition
         local size  = Button.AbsoluteSize
@@ -116,17 +138,40 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
         local RobotClaw = require(game:GetService("ReplicatedStorage").Client.Gui.Frames.Minigames["Robot Claw"])
         local instant_finish; instant_finish = hookfunction(RobotClaw, function(a)
             local cleanup, useless = instant_finish(a)
-            if ClawToggledFast.Flag then
+            if ClawToggledFast.Flag and not ClawToggled.Flag then
                 cleanup() 
             end
             return cleanup, useless
         end)
 
+        workspace.ChildAdded:Connect(function(Child)
+            if ClawToggled.Flag and not ClawToggledFast.Flag and tostring(Child) == "ClawMachine" then
+                local ClawMachine = Child
+                wait(2)
+                ClawMachine:FindFirstChild("Capsule").HitBox.CFrame = ClawMachine:FindFirstChild("CollectPart").CFrame 
+                for _,v in ClawMachine:GetChildren() do
+                    if tostring(v) == "Capsule" then
+                        task.wait(3.25)
+                        v.HitBox.CFrame = ClawMachine:FindFirstChild("CollectPart").CFrame
+                    end
+                end
+                Event:FireServer("FinishMinigame")
+            end
+        end)
+        workspace.ChildRemoved:Connect(function(Child)
+            if ClawToggled.Flag and not ClawToggledFast.Flag and tostring(Child) == "ClawMachine" then
+                Event:FireServer("SkipMinigameCooldown", "Robot Claw")
+                Event:FireServer("StartMinigame", "Robot Claw", Difficulty.Flag)
+            end
+        end)
+
         while true do
-            if ClawToggledFast.Flag then
-                Event:FireServer("StartMinigame", "Robot Claw", "Insane")
+            if ClawToggledFast.Flag and not ClawToggled.Flag then
+                Event:FireServer("StartMinigame", "Robot Claw", Difficulty.Flag)
                 Event:FireServer("FinishMinigame")
                 Event:FireServer("SkipMinigameCooldown", "Robot Claw")
+            end
+            if AutoRewards.Flag then
                 pcall(function()
                     ClickButton(LocalPlayer.PlayerGui.ScreenGui.Prompt.Frame.Main.Buttons.Template.Button) 
                 end)
@@ -134,5 +179,7 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
             wait()
         end
     end)
-    AutoClaw:Section("faaaaaaaart...")
+    AutoClaw:Section("plain auto claw gets everything")
+    AutoClaw:Section("and it's 13/s faster [Insane]")
+    AutoClaw:Section("dont have both enabled or you die")
 end
