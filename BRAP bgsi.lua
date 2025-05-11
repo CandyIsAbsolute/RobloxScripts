@@ -15,7 +15,7 @@ local BoardUtil = require(ReplicatedStorage.Shared.Utils.BoardUtil)
 local AutoDice = Library:CreateWindow("Smart Dice") do
     local StatusText = ""
 
-    AutoDice:Section("made by ydnac2110")
+    AutoDice:Section("made by ydnac#2110")
     local AutoRoll, DefaultDice, GoldenDice
     AutoRoll = AutoDice:Toggle("Auto Roll", {})
     AutoDice:Section("Configuration").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(0.662745, 0.403921, 1)
@@ -107,6 +107,11 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
                 Event:FireServer("SkipMinigameCooldown", "Robot Claw")
                 wait(1)
                 Event:FireServer("StartMinigame", "Robot Claw", Difficulty.Flag)            
+            end)
+        else
+            Event:FireServer("FinishMinigame")
+            pcall(function()
+                workspace:FindFirstChild('ClawMachine'):Destroy()
             end)
         end
     end)
