@@ -94,7 +94,9 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
 end
 local AutoClaw = Library:CreateWindow("Robot Claw") do
     AutoClaw:Section("")
-    local ClawToggledFast = AutoClaw:Toggle("Auto Claw [FAST]", {})
+    local ClawToggledFast = AutoClaw:Toggle("Auto Claw [FAST]", {}, function()
+        Event:FireServer("FinishMinigame")
+    end)
 
     local function ClickButton(Button)
         local pos   = Button.AbsolutePosition
@@ -105,12 +107,12 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
         VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, Button, 0)
     end
     task.spawn(function()
-        local special_wait;special_wait = hookfunction(task.wait, function(a)
-            if not checkcaller() and ClawToggledFast.Flag then
-                a = 0
-            end
-            return special_wait(a)
-        end)
+        -- local special_wait;special_wait = hookfunction(task.wait, function(a)
+        --     if not checkcaller() and ClawToggledFast.Flag then
+        --         a = 0
+        --     end
+        --     return special_wait(a)
+        -- end)
         local RobotClaw = require(game:GetService("ReplicatedStorage").Client.Gui.Frames.Minigames["Robot Claw"])
         local instant_finish; instant_finish = hookfunction(RobotClaw, function(a)
             local cleanup, useless = instant_finish(a)
@@ -121,7 +123,6 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
         while true do
             if ClawToggledFast.Flag then
                 Event:FireServer("StartMinigame", "Robot Claw", "Insane")
-                -- task.wait()
                 Event:FireServer("FinishMinigame")
                 Event:FireServer("SkipMinigameCooldown", "Robot Claw")
                 -- task.wait()
