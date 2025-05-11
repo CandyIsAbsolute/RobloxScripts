@@ -105,7 +105,7 @@ local AutoClaw = Library:CreateWindow("Robot Claw") do
             task.spawn(function()
                 Event:FireServer("FinishMinigame")
                 Event:FireServer("SkipMinigameCooldown", "Robot Claw")
-                wait(1)
+                wait(2)
                 Event:FireServer("StartMinigame", "Robot Claw", Difficulty.Flag)            
             end)
         else
