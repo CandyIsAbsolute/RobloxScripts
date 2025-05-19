@@ -16,8 +16,10 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
     local StatusText = ""
 
     AutoDice:Section("made by ydnac#2110")
-    local AutoRoll, DefaultDice, GoldenDice
-    AutoRoll = AutoDice:Toggle("Auto Roll", {})
+    local AutoRoll, DefaultDice, GoldenDice, Rolled, RollDice
+    AutoRoll = AutoDice:Toggle("Auto Roll", {}, function()
+        Rolled = RollDice("Dice")
+    end)
     AutoDice:Section("Configuration").Self:FindFirstChild("section_lbl").TextColor3 = Color3.new(0.662745, 0.403921, 1)
     DefaultDice = AutoDice:Dropdown("Default Dice", {
         list = {
@@ -71,8 +73,6 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
         StatusText = `Current tile: {BoardUtil.Nodes[TileIndex].Type} | TileIndex: {TileIndex}`
         return DefaultDice.Flag
     end
-
-    local Rolled = RollDice("Dice")
     task.spawn(function()
         while true do
             if AutoRoll.Flag then
@@ -89,6 +89,7 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
         end
     end)
 end
+
 local AutoClaw = Library:CreateWindow("Robot Claw") do
     AutoClaw:Section("")
     local ClawToggledFast, ClawToggled, Difficulty, AutoRewards
