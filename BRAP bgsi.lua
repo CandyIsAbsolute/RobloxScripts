@@ -38,7 +38,7 @@ local AutoDice = Library:CreateWindow("Smart Dice") do
     local Status = AutoDice:Section("test").Self
     local LastRolled = AutoDice:Section("test").Self
 
-    local function RollDice(DiceType)
+    function RollDice(DiceType)
         local Returned
         repeat wait()
             Returned = Function:InvokeServer("RollDice", DiceType)
